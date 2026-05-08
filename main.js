@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // --- Cinematic Spaceship Animation ---
+        // --- Detailed Lunar Base Construction ---
         
         const shipBlueprint = [
             "       XXXX       ",
@@ -142,19 +142,24 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         
         let shipParts = [];
-        let cadets = [];
+        let actors = [];
         let simState = 'BUILDING'; // BUILDING, BOARDING, TAKEOFF, RESET
         let shipYOffset = 0;
-        let blockSize = 8;
+        let blockSize = 4;
+        let surfaceY;
+        let cx, cy;
         
         function resetSim() {
             simState = 'BUILDING';
             shipYOffset = 0;
             shipParts = [];
+            surfaceY = height - 150; // Give plenty of room for craters
+            cx = width / 2;
+            cy = surfaceY;
             
-            // Generate blueprint coordinates
-            const startX = width / 2 - (shipBlueprint[0].length * blockSize) / 2;
-            const startY = height / 3 - 50;
+            // Generate blueprint coordinates IN the center crater
+            const startX = cx - (shipBlueprint[0].length * blockSize) / 2;
+            const startY = surfaceY + 30 - (shipBlueprint.length * blockSize); 
             
             for (let row = 0; row < shipBlueprint.length; row++) {
                 for (let col = 0; col < shipBlueprint[row].length; col++) {
@@ -170,54 +175,209 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            cadets = [];
-            for(let i = 0; i < 15; i++) {
-                cadets.push(new JetpackCadet());
-            }
+            actors = [];
+            
+            // 1 Digger
+            actors.push(new DiggerCadet(cx - 250, surfaceY + 15));
+            
+            // 2 Rovers (start slightly offscreen)
+            actors.push(new RoverCadet(-50, surfaceY, cx - 120, 1)); // Left to center
+            actors.push(new RoverCadet(width + 50, surfaceY, cx + 120, -1)); // Right to center
+            
+            // 4 Ladder Cadets (Right angles only)
+            for(let i=0; i<4; i++) actors.push(new BuilderCadet(true));
+            
+            // 5 Jetpack Cadets (Direct flight)
+            for(let i=0; i<5; i++) actors.push(new BuilderCadet(false));
         }
 
-        class Moon {
+        class MoonSurface {
             draw(ctx, w, h) {
-                // Draw a pixelated-style massive arc for the moon surface
-                ctx.fillStyle = '#0a0a0c'; // slightly bluish dark grey
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(w / 2, h + w * 0.8, w * 0.9, 0, Math.PI * 2);
-                ctx.fill();
                 
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-                ctx.lineWidth = 4;
+                // Left surface
+                ctx.moveTo(0, surfaceY);
+                ctx.lineTo(cx - 300, surfaceY);
+                // Left small crater
+                ctx.lineTo(cx - 280, surfaceY + 15);
+                ctx.lineTo(cx - 220, surfaceY + 15);
+                ctx.lineTo(cx - 200, surfaceY);
+                // Middle surface
+                ctx.lineTo(cx - 120, surfaceY);
+                // Large center crater
+                ctx.lineTo(cx - 90, surfaceY + 40);
+                ctx.lineTo(cx + 90, surfaceY + 40);
+                ctx.lineTo(cx + 120, surfaceY);
+                // Right middle surface
+                ctx.lineTo(cx + 200, surfaceY);
+                // Right small crater
+                ctx.lineTo(cx + 220, surfaceY + 15);
+                ctx.lineTo(cx + 280, surfaceY + 15);
+                ctx.lineTo(cx + 300, surfaceY);
+                // Right surface
+                ctx.lineTo(w, surfaceY);
+                
                 ctx.stroke();
+
+                // Draw some pixelated texture dots
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx - 250, surfaceY + 25, 2, 2);
+                ctx.fillRect(cx + 250, surfaceY + 25, 2, 2);
+                ctx.fillRect(cx - 50, surfaceY + 50, 2, 2);
+                ctx.fillRect(cx + 50, surfaceY + 50, 2, 2);
+                ctx.fillRect(cx - 150, surfaceY + 10, 2, 2);
+                ctx.fillRect(cx + 150, surfaceY + 10, 2, 2);
+                ctx.fillRect(cx - 350, surfaceY + 20, 2, 2);
+                ctx.fillRect(cx + 350, surfaceY + 20, 2, 2);
             }
         }
         
-        const moon = new Moon();
+        const moon = new MoonSurface();
 
-        class JetpackCadet {
+        class Actor {
             constructor() {
-                this.x = width / 2 + (Math.random() - 0.5) * width;
-                this.y = height - Math.random() * 100 - 50; // Spawn safely on screen above bottom edge
-                this.spriteSize = 3;
-                this.speed = Math.random() * 2 + 2; 
-                this.state = 'IDLE'; 
-                this.target = null;
-                this.carryingPart = false;
-                
-                // 5x5 alien sprite with jetpack legs
-                this.sprite = [
-                    [0, 1, 0, 1, 0],
-                    [1, 1, 1, 1, 1],
-                    [1, 0, 1, 0, 1],
-                    [1, 1, 1, 1, 1],
-                    [1, 0, 0, 0, 1] 
+                this.state = 'WORKING';
+                this.spriteSize = 1.5;
+            }
+            drawSprite(ctx, spriteMatrix, px, py, isCyan=false) {
+                ctx.fillStyle = isCyan ? 'rgba(0, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.8)';
+                for (let r = 0; r < spriteMatrix.length; r++) {
+                    for (let c = 0; c < spriteMatrix[r].length; c++) {
+                        if (spriteMatrix[r][c] === 1) {
+                            ctx.fillRect(px + c * this.spriteSize, py + r * this.spriteSize, this.spriteSize, this.spriteSize);
+                        }
+                    }
+                }
+            }
+            boardUpdate() {
+                let dx = cx - this.x;
+                let dy = (surfaceY + 20) - this.y; // Center of craft
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 10) {
+                    this.state = 'GONE';
+                } else {
+                    this.x += (dx/dist) * 3;
+                    this.y += (dy/dist) * 3;
+                }
+            }
+        }
+
+        class DiggerCadet extends Actor {
+            constructor(x, y) {
+                super();
+                this.x = x;
+                this.y = y - 7;
+                this.frame = 0;
+                this.timer = 0;
+                this.sprite1 = [
+                    [0,1,0,0,1],
+                    [1,1,1,0,1],
+                    [1,0,1,1,1],
+                    [1,1,1,0,0],
+                    [1,0,1,0,0]
+                ];
+                this.sprite2 = [
+                    [0,1,0,0,0],
+                    [1,1,1,0,0],
+                    [1,0,1,1,1],
+                    [1,1,1,0,1],
+                    [1,0,1,0,1]
                 ];
             }
-            
+            update() {
+                if (this.state === 'GONE') return;
+                if (simState === 'BOARDING') {
+                    this.boardUpdate();
+                    return;
+                }
+                this.timer++;
+                if (this.timer > 20) {
+                    this.frame = 1 - this.frame;
+                    this.timer = 0;
+                }
+            }
+            draw(ctx) {
+                if (this.state === 'GONE') return;
+                this.drawSprite(ctx, this.frame === 0 ? this.sprite1 : this.sprite2, this.x, this.y);
+            }
+        }
+
+        class RoverCadet extends Actor {
+            constructor(startX, startY, endX, dir) {
+                super();
+                this.startX = startX;
+                this.y = startY - 6;
+                this.endX = endX;
+                this.x = startX;
+                this.dir = dir; // 1 or -1
+                this.speed = 1.2;
+                this.waitTimer = 0;
+                this.sprite = [
+                    [0,1,1,0,0],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [0,1,0,1,0]
+                ];
+            }
+            update() {
+                if (this.state === 'GONE') return;
+                if (simState === 'BOARDING') {
+                    this.boardUpdate();
+                    return;
+                }
+
+                if (this.waitTimer > 0) {
+                    this.waitTimer--;
+                    return;
+                }
+
+                this.x += this.speed * this.dir;
+                
+                // If reached destination (center crater edge or spawn)
+                if ((this.dir === 1 && this.x > this.endX) || (this.dir === -1 && this.x < this.endX)) {
+                    this.dir *= -1; // turnaround
+                    this.waitTimer = 60; // wait 1 second
+                    let temp = this.startX;
+                    this.startX = this.endX;
+                    this.endX = temp;
+                }
+            }
+            draw(ctx) {
+                if (this.state === 'GONE') return;
+                this.drawSprite(ctx, this.sprite, this.x, this.y);
+                // Draw cargo if moving towards center
+                let movingToCenter = (this.x < cx && this.dir === 1) || (this.x > cx && this.dir === -1);
+                if (movingToCenter) {
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(this.x + 2, this.y - 3, 4, 4);
+                }
+            }
+        }
+
+        class BuilderCadet extends Actor {
+            constructor(isLadder) {
+                super();
+                this.isLadder = isLadder; // True = right angles only, False = jetpack diagonal
+                this.x = cx + (Math.random() > 0.5 ? 250 : -250); // Start at small craters
+                this.y = surfaceY + 15;
+                this.speed = Math.random() * 1 + 1.5;
+                this.state = 'FETCHING'; 
+                this.target = null;
+                this.carryingPart = false;
+                this.sprite = [
+                    [0, 1, 0],
+                    [1, 1, 1],
+                    [1, 0, 1],
+                    [1, 1, 1]
+                ];
+            }
             update(parts) {
                 if (this.state === 'GONE') return;
-
-                if (simState === 'BOARDING' && this.state !== 'BOARDING') {
-                    this.state = 'BOARDING';
-                    this.target = { x: width / 2, y: height / 3 }; 
+                if (simState === 'BOARDING') {
+                    this.boardUpdate();
+                    return;
                 }
 
                 if (this.state === 'IDLE') {
@@ -227,76 +387,56 @@ document.addEventListener('DOMContentLoaded', () => {
                         p.targeted = true;
                         this.targetPart = p;
                         this.state = 'FETCHING';
-                        // Fly to random point on moon
-                        this.target = { x: width / 2 + (Math.random() - 0.5) * width * 0.8, y: height - Math.random() * 50 - 20 };
+                        // Fly to small craters to fetch
+                        this.target = { x: cx + (Math.random() > 0.5 ? 250 : -250), y: surfaceY + 15 };
                     }
                 }
 
-                if (this.state === 'FETCHING') {
+                if (this.state === 'FETCHING' || this.state === 'BUILDING') {
                     let dx = this.target.x - this.x;
                     let dy = this.target.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 15) { // Increased threshold to avoid overshoot vibration
-                        this.carryingPart = true;
-                        this.state = 'BUILDING';
-                        this.target = { x: this.targetPart.x, y: this.targetPart.y };
+                    
+                    if (dist < 5) {
+                        if (this.state === 'FETCHING') {
+                            this.carryingPart = true;
+                            this.state = 'BUILDING';
+                            this.target = { x: this.targetPart.x, y: this.targetPart.y };
+                        } else {
+                            this.targetPart.placed = true;
+                            this.targetPart.alpha = 0.9;
+                            this.carryingPart = false;
+                            this.state = 'IDLE';
+                        }
                     } else {
-                        this.x += (dx / dist) * this.speed;
-                        this.y += (dy / dist) * this.speed;
-                    }
-                }
-
-                if (this.state === 'BUILDING') {
-                    let dx = this.target.x - this.x;
-                    let dy = this.target.y - this.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 15) {
-                        this.targetPart.placed = true;
-                        this.targetPart.alpha = 0.9;
-                        this.carryingPart = false;
-                        this.state = 'IDLE';
-                    } else {
-                        this.x += (dx / dist) * this.speed;
-                        this.y += (dy / dist) * this.speed;
-                    }
-                }
-
-                if (this.state === 'BOARDING') {
-                    let dx = this.target.x - this.x;
-                    let dy = this.target.y - this.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 15) {
-                        this.state = 'GONE'; 
-                    } else {
-                        this.x += (dx / dist) * this.speed * 2; 
-                        this.y += (dy / dist) * this.speed * 2;
-                    }
-                }
-            }
-            
-            draw(ctx) {
-                if (this.state === 'GONE') return;
-                
-                ctx.fillStyle = `rgba(255, 255, 255, 0.8)`;
-                for (let row = 0; row < 5; row++) {
-                    for (let col = 0; col < 5; col++) {
-                        if (this.sprite[row][col] === 1) {
-                            ctx.fillRect(this.x + col * this.spriteSize, this.y + row * this.spriteSize, this.spriteSize, this.spriteSize);
+                        if (this.isLadder) {
+                            // Move manhattan style (Y first, then X)
+                            if (Math.abs(dy) > 2) {
+                                this.y += Math.sign(dy) * this.speed;
+                            } else {
+                                this.x += Math.sign(dx) * this.speed;
+                            }
+                        } else {
+                            this.x += (dx / dist) * this.speed;
+                            this.y += (dy / dist) * this.speed;
                         }
                     }
                 }
+            }
+            draw(ctx) {
+                if (this.state === 'GONE') return;
+                this.drawSprite(ctx, this.sprite, this.x, this.y);
                 
-                // Jetpack cyan thrust
-                if (this.state === 'FETCHING' || this.state === 'BUILDING' || this.state === 'BOARDING') {
-                    ctx.fillStyle = `rgba(0, 255, 255, ${Math.random() * 0.5 + 0.3})`; 
-                    ctx.fillRect(this.x, this.y + 5 * this.spriteSize, this.spriteSize, this.spriteSize * (Math.random() * 3 + 1));
-                    ctx.fillRect(this.x + 4 * this.spriteSize, this.y + 5 * this.spriteSize, this.spriteSize, this.spriteSize * (Math.random() * 3 + 1));
+                if (!this.isLadder && (this.state === 'FETCHING' || this.state === 'BUILDING')) {
+                    // Jetpack exhaust
+                    ctx.fillStyle = `rgba(0, 255, 255, ${Math.random() * 0.5 + 0.3})`;
+                    ctx.fillRect(this.x, this.y + 4 * this.spriteSize, 2, Math.random() * 4 + 2);
+                    ctx.fillRect(this.x + 2 * this.spriteSize, this.y + 4 * this.spriteSize, 2, Math.random() * 4 + 2);
                 }
                 
-                // Part carried
                 if (this.carryingPart) {
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(this.x + 2 * this.spriteSize, this.y - 2 * this.spriteSize, blockSize, blockSize);
+                    ctx.fillRect(this.x, this.y - 4, blockSize, blockSize);
                 }
             }
         }
@@ -339,9 +479,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Draw massive cyan thruster
                 ctx.fillStyle = `rgba(0, 255, 255, ${Math.random() * 0.4 + 0.1})`;
                 ctx.beginPath();
-                ctx.moveTo(width / 2 - 40, height / 3 + 10 + shipYOffset);
-                ctx.lineTo(width / 2 + 40, height / 3 + 10 + shipYOffset);
-                ctx.lineTo(width / 2, height / 3 + 150 + shipYOffset + Math.random() * 100);
+                ctx.moveTo(cx - 20, surfaceY + 20 + shipYOffset);
+                ctx.lineTo(cx + 20, surfaceY + 20 + shipYOffset);
+                ctx.lineTo(cx, surfaceY + 200 + shipYOffset + Math.random() * 100);
                 ctx.fill();
 
                 if (shipYOffset < -height) {
@@ -358,10 +498,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Update and Draw Cadets
-            cadets.forEach(cadet => {
-                cadet.update(shipParts);
-                cadet.draw(ctx);
+            // Update and Draw Actors
+            actors.forEach(actor => {
+                if (actor.update.length > 0) {
+                    actor.update(shipParts);
+                } else {
+                    actor.update();
+                }
+                actor.draw(ctx);
             });
 
             requestAnimationFrame(animateParticles);
