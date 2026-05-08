@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise System Builder | ALUMNI INTERACTIVE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .page-wrapper { padding-top: 120px; min-height: 100vh; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="text-decoration:none;"><span class="text-metallic">ALUMNI</span> INTΞRACTIVΞ</a>
+            <nav class="nav-links">
+                <a href="index.html#services">Services</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper container">
+        <div class="pipeline-header animate-on-scroll">
+            <h1 class="text-metallic">Architect Your Enterprise System</h1>
+            <p>Select your operational tier and configure advanced infrastructure for large-scale brands.</p>
+        </div>
+
+        <div class="pipeline-grid">
+            <!-- Left Side: Options -->
+            <div class="options-panel">
+                <h3>1. Select Architecture Tier</h3>
+                <div class="option-item base-tier selected" data-price="25000" data-name="Base Enterprise ($25k)">
+                    <div class="option-info">
+                        <h4>Base Enterprise</h4>
+                        <p>High-performance headless architecture and robust CRM integration.</p>
+                    </div>
+                    <div class="option-price">$25,000</div>
+                </div>
+                <div class="option-item base-tier" data-price="50000" data-name="Advanced Enterprise ($50k)">
+                    <div class="option-info">
+                        <h4>Advanced Enterprise</h4>
+                        <p>Includes Base + Custom mobile applications and advanced user segmentation.</p>
+                    </div>
+                    <div class="option-price">$50,000</div>
+                </div>
+                <div class="option-item base-tier" data-price="100000" data-name="Ultimate Enterprise ($100k+)">
+                    <div class="option-info">
+                        <h4>Ultimate Enterprise</h4>
+                        <p>Full digital transformation, bespoke AI integration, and on-premise solutions.</p>
+                    </div>
+                    <div class="option-price">$100,000</div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">2. Select Add-ons</h3>
+                <div class="option-item addon" data-price="5000" data-name="Franchise Management Portal">
+                    <div class="option-info">
+                        <h4>Franchise Management Portal</h4>
+                        <p>Centralized dashboard for multi-location performance tracking.</p>
+                    </div>
+                    <div class="option-price">+$5,000</div>
+                </div>
+                <div class="option-item addon" data-price="8000" data-name="Multi-Location Sync">
+                    <div class="option-info">
+                        <h4>Multi-Location Sync</h4>
+                        <p>Real-time inventory and data synchronization across regions.</p>
+                    </div>
+                    <div class="option-price">+$8,000</div>
+                </div>
+                <div class="option-item addon" data-price="15000" data-name="Dedicated Edge Servers">
+                    <div class="option-info">
+                        <h4>Dedicated Edge Servers</h4>
+                        <p>Global low-latency deployment for mission-critical applications.</p>
+                    </div>
+                    <div class="option-price">+$15,000</div>
+                </div>
+            </div>
+
+            <!-- Right Side: Summary & Form -->
+            <div class="summary-panel">
+                <h3>Estimated Investment</h3>
+                <div class="summary-total" id="priceDisplay">$25,000 <span>USD</span></div>
+                
+                <h3 style="margin-top: 2rem;">Submit Your Architecture</h3>
+                <p style="color: var(--text-dim); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Submit your selected infrastructure to our enterprise architects. We'll follow up within 24 hours.
+                </p>
+                <!-- Formspree Endpoint -->
+                <form class="lead-form" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <input type="tel" name="phone" placeholder="Phone Number">
+                    <input type="text" name="company" placeholder="Company Name" required>
+                    <textarea name="project_details" placeholder="Tell us more about your enterprise requirements..." rows="4"></textarea>
+                    
+                    <!-- Hidden fields to capture calculator data -->
+                    <input type="hidden" name="Selected_Tier" id="inputTier" value="Base Enterprise ($25k)">
+                    <input type="hidden" name="Selected_Addons" id="inputAddons" value="None">
+                    <input type="hidden" name="Total_Estimated_Price" id="inputTotal" value="$25,000">
+                    <input type="hidden" name="_subject" value="New Enterprise System Inquiry!">
+
+                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Initialize Enterprise System</button>
+                </form>
+                <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.8rem; text-align: center;">
+                    *Prices are estimates and subject to final scope review.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="logo" style="font-size: 1.2rem;"><span class="text-metallic">ALUMNI</span> INTΞRACTIVΞ</div>
+            <p style="color: var(--text-dim); margin-top: 10px; font-size: 0.9rem;">&copy; 2026 Alumni Interactive. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const baseTiers = document.querySelectorAll('.base-tier');
+        const addons = document.querySelectorAll('.addon');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const inputTier = document.getElementById('inputTier');
+        const inputAddons = document.getElementById('inputAddons');
+        const inputTotal = document.getElementById('inputTotal');
+
+        let currentBasePrice = 25000;
+        let currentTierName = "Base Enterprise ($25k)";
+
+        function updateTotals() {
+            let total = currentBasePrice;
+            let selectedAddons = [];
+
+            addons.forEach(addon => {
+                if (addon.classList.contains('selected')) {
+                    total += parseInt(addon.getAttribute('data-price'));
+                    selectedAddons.push(addon.getAttribute('data-name'));
+                }
+            });
+
+            const formattedTotal = "$" + total.toLocaleString();
+            priceDisplay.innerHTML = formattedTotal + " <span>USD</span>";
+
+            inputTotal.value = formattedTotal;
+            inputAddons.value = selectedAddons.length > 0 ? selectedAddons.join(", ") : "None";
+        }
+
+        baseTiers.forEach(tier => {
+            tier.addEventListener('click', () => {
+                baseTiers.forEach(t => t.classList.remove('selected'));
+                tier.classList.add('selected');
+                currentBasePrice = parseInt(tier.getAttribute('data-price'));
+                currentTierName = tier.getAttribute('data-name');
+                inputTier.value = currentTierName;
+                updateTotals();
+            });
+        });
+
+        addons.forEach(addon => {
+            addon.addEventListener('click', () => {
+                addon.classList.toggle('selected');
+                updateTotals();
+            });
+        });
+    </script>
+</body>
+</html>

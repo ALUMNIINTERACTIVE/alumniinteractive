@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth System Builder | ALUMNI INTERACTIVE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .page-wrapper { padding-top: 120px; min-height: 100vh; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="text-decoration:none;"><span class="text-metallic">ALUMNI</span> INTΞRACTIVΞ</a>
+            <nav class="nav-links">
+                <a href="index.html#services">Services</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper container">
+        <div class="pipeline-header animate-on-scroll">
+            <h1 class="text-metallic">Scale With The Growth System</h1>
+            <p>Select your foundational retainer and build a predictable recurring revenue engine.</p>
+        </div>
+
+        <div class="pipeline-grid">
+            <!-- Left Side: Options -->
+            <div class="options-panel">
+                <h3>1. Select Base Retainer</h3>
+                <div class="option-item base-tier selected" data-price="500" data-name="Core Growth ($500/mo)">
+                    <div class="option-info">
+                        <h4>Core Growth</h4>
+                        <p>Hosting, maintenance, and essential security updates.</p>
+                    </div>
+                    <div class="option-price">$500 <span style="font-size:0.7em; color:var(--text-dim);">/mo</span></div>
+                </div>
+                <div class="option-item base-tier" data-price="1000" data-name="Advanced Growth ($1k/mo)">
+                    <div class="option-info">
+                        <h4>Advanced Growth</h4>
+                        <p>Includes Core + Weekly content updates and basic marketing.</p>
+                    </div>
+                    <div class="option-price">$1,000 <span style="font-size:0.7em; color:var(--text-dim);">/mo</span></div>
+                </div>
+                <div class="option-item base-tier" data-price="2000" data-name="Ultimate Growth ($2k/mo)">
+                    <div class="option-info">
+                        <h4>Ultimate Growth</h4>
+                        <p>Includes Advanced + Full digital campaigns and A/B testing.</p>
+                    </div>
+                    <div class="option-price">$2,000 <span style="font-size:0.7em; color:var(--text-dim);">/mo</span></div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">2. Select Monthly Add-ons</h3>
+                <div class="option-item addon" data-price="200" data-name="Managed SEO Services">
+                    <div class="option-info">
+                        <h4>Managed SEO Services</h4>
+                        <p>Continuous keyword optimization and backlink building.</p>
+                    </div>
+                    <div class="option-price">+$200 <span style="font-size:0.7em; color:var(--text-dim);">/mo</span></div>
+                </div>
+                <div class="option-item addon" data-price="500" data-name="Automated Paid Ads">
+                    <div class="option-info">
+                        <h4>Automated Paid Ads</h4>
+                        <p>Algorithmic ad spend management across social channels.</p>
+                    </div>
+                    <div class="option-price">+$500 <span style="font-size:0.7em; color:var(--text-dim);">/mo</span></div>
+                </div>
+                <div class="option-item addon" data-price="1000" data-name="Custom AI Agent Retainer">
+                    <div class="option-info">
+                        <h4>Custom AI Agent Retainer</h4>
+                        <p>Dedicated AI model fine-tuning and monthly training cycles.</p>
+                    </div>
+                    <div class="option-price">+$1,000 <span style="font-size:0.7em; color:var(--text-dim);">/mo</span></div>
+                </div>
+            </div>
+
+            <!-- Right Side: Summary & Form -->
+            <div class="summary-panel">
+                <h3>Estimated Monthly Retainer</h3>
+                <div class="summary-total" id="priceDisplay">$500 <span>USD / month</span></div>
+                
+                <h3 style="margin-top: 2rem;">Submit Your Build</h3>
+                <p style="color: var(--text-dim); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Submit your selected infrastructure to our team. We'll follow up within 24 hours.
+                </p>
+                <!-- Formspree Endpoint -->
+                <form class="lead-form" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <input type="tel" name="phone" placeholder="Phone Number">
+                    <textarea name="project_details" placeholder="Tell us more about your growth goals..." rows="4"></textarea>
+                    
+                    <!-- Hidden fields to capture calculator data -->
+                    <input type="hidden" name="Selected_Tier" id="inputTier" value="Core Growth ($500/mo)">
+                    <input type="hidden" name="Selected_Addons" id="inputAddons" value="None">
+                    <input type="hidden" name="Total_Estimated_Price" id="inputTotal" value="$500 / month">
+                    <input type="hidden" name="_subject" value="New Growth System Inquiry!">
+
+                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Initialize Growth System</button>
+                </form>
+                <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.8rem; text-align: center;">
+                    *Prices are estimates and subject to final scope review.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="logo" style="font-size: 1.2rem;"><span class="text-metallic">ALUMNI</span> INTΞRACTIVΞ</div>
+            <p style="color: var(--text-dim); margin-top: 10px; font-size: 0.9rem;">&copy; 2026 Alumni Interactive. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const baseTiers = document.querySelectorAll('.base-tier');
+        const addons = document.querySelectorAll('.addon');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const inputTier = document.getElementById('inputTier');
+        const inputAddons = document.getElementById('inputAddons');
+        const inputTotal = document.getElementById('inputTotal');
+
+        let currentBasePrice = 500;
+        let currentTierName = "Core Growth ($500/mo)";
+
+        function updateTotals() {
+            let total = currentBasePrice;
+            let selectedAddons = [];
+
+            addons.forEach(addon => {
+                if (addon.classList.contains('selected')) {
+                    total += parseInt(addon.getAttribute('data-price'));
+                    selectedAddons.push(addon.getAttribute('data-name'));
+                }
+            });
+
+            const formattedTotal = "$" + total.toLocaleString();
+            priceDisplay.innerHTML = formattedTotal + " <span>USD / month</span>";
+
+            inputTotal.value = formattedTotal + " / month";
+            inputAddons.value = selectedAddons.length > 0 ? selectedAddons.join(", ") : "None";
+        }
+
+        baseTiers.forEach(tier => {
+            tier.addEventListener('click', () => {
+                baseTiers.forEach(t => t.classList.remove('selected'));
+                tier.classList.add('selected');
+                currentBasePrice = parseInt(tier.getAttribute('data-price'));
+                currentTierName = tier.getAttribute('data-name');
+                inputTier.value = currentTierName;
+                updateTotals();
+            });
+        });
+
+        addons.forEach(addon => {
+            addon.addEventListener('click', () => {
+                addon.classList.toggle('selected');
+                updateTotals();
+            });
+        });
+    </script>
+</body>
+</html>
