@@ -133,9 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.size = 2; // thin 2x2 pixel blocks
+                this.size = 6; // Make blocks larger and more visible
                 this.opacity = 0;
-                this.maxOpacity = Math.random() * 0.2 + 0.05; // very faint background structures
+                this.maxOpacity = Math.random() * 0.4 + 0.15; // More visible background structures
             }
             update() {
                 if (this.opacity < this.maxOpacity) {
@@ -152,12 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.pixelSize = 1.5; // Size of each "pixel" in the cadet
+                this.pixelSize = 4; // Make the aliens much larger
                 this.speed = 1.5;
                 this.direction = Math.floor(Math.random() * 4); // 0: up, 1: right, 2: down, 3: left
                 this.moveTimer = 0;
                 this.buildTimer = 0;
-                this.opacity = 0.6;
+                this.opacity = 0.8; // Make them brighter
                 
                 // 5x5 alien sprite
                 this.sprite = [
@@ -190,10 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.buildTimer--;
                 if (this.buildTimer <= 0) {
                     // Snap to grid for building to look structured
-                    const gridX = Math.floor(this.x / 4) * 4;
-                    const gridY = Math.floor(this.y / 4) * 4;
+                    const gridX = Math.floor(this.x / 6) * 6;
+                    const gridY = Math.floor(this.y / 6) * 6;
                     // Max limit to prevent infinite lag
-                    if (blocksArray.length < 2000) {
+                    if (blocksArray.length < 2500) {
                         blocksArray.push(new ColonyBlock(gridX, gridY));
                     }
                     this.buildTimer = Math.random() * 40 + 10;
@@ -228,8 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             cadets = [];
             colonyBlocks = [];
-            // Spawn 5 cadets
-            for (let i = 0; i < 5; i++) {
+            // Spawn 15 cadets to make them very noticeable
+            for (let i = 0; i < 15; i++) {
                 cadets.push(new AtariCadet());
             }
         }
