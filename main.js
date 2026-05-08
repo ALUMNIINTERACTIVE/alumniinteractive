@@ -287,8 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
         class DiggerCadet extends Actor {
             constructor(x, y) {
                 super();
-                this.x = x;
-                this.y = y - 7;
+                this.spriteSize = 5.2; // Scaled up 100%
+                this.x = x - (5 * this.spriteSize) / 2; // Center in crater
+                this.y = y - (5 * this.spriteSize); // Rest perfectly on top of the ground
                 this.frame = 0;
                 this.timer = 0;
                 this.sprite1 = [
