@@ -196,12 +196,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             actors = [];
             
-            // 1 Digger
-            actors.push(new DiggerCadet(cx - 250, surfaceY + 15));
+            // 1 Digger (moved to flat plateau between left crater and center crater)
+            actors.push(new DiggerCadet(cx - 170, 0));
             
-            // 2 Rovers (start slightly offscreen)
-            actors.push(new RoverCadet(-50, surfaceY, cx - 120, 1)); // Left to center
-            actors.push(new RoverCadet(width + 50, surfaceY, cx + 120, -1)); // Right to center
+            // 2 Rovers (desynchronized speeds and start times)
+            let r1 = new RoverCadet(-50, 0, cx - 120, 1); // Left to center
+            r1.speed = 1.4;
+            actors.push(r1);
+            
+            let r2 = new RoverCadet(width + 50, 0, cx + 120, -1); // Right to center
+            r2.speed = 0.8;
+            r2.waitTimer = 180; // Wait 3 seconds before starting
+            actors.push(r2);
             
             // 4 Ladder Cadets (Right angles only)
             for(let i=0; i<4; i++) actors.push(new BuilderCadet(true));
@@ -259,6 +265,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.moveTo(cx + 80, surfaceY - 30); ctx.lineTo(cx + 60, surfaceY - 10);
                 ctx.moveTo(cx + 80, surfaceY + 10); ctx.lineTo(cx + 60, surfaceY + 30);
                 ctx.stroke();
+
+                // Draw Animated Pump in the left small crater
+                let time = Date.now() / 400; // Animation speed
+                let pumpAngle = Math.sin(time) * 0.4; // Oscillation angle
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx - 260, surfaceY + 5, 20, 10); // Pump base
+                ctx.fillRect(cx - 252, surfaceY - 15, 4, 20); // Pump tower
+                
+                ctx.save();
+                ctx.translate(cx - 250, surfaceY - 15);
+                ctx.rotate(pumpAngle);
+                ctx.fillRect(-15, -2, 30, 4); // Walking beam
+                ctx.fillRect(13, -2, 2, 15); // Horse head / pump rod
+                ctx.restore();
 
                 // Draw some pixelated texture dots
                 ctx.fillStyle = '#ffffff';
