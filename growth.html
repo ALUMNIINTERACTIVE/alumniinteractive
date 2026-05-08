@@ -87,7 +87,7 @@
                     Submit your selected infrastructure to our team. We'll follow up within 24 hours.
                 </p>
                 <!-- Formspree Endpoint -->
-                <form class="lead-form" action="https://formspree.io/f/xrejygre" method="POST">
+                <form id="pipelineForm" class="lead-form" action="https://formspree.io/f/xrejygre" method="POST">
                     <input type="text" name="name" placeholder="Your Name" required>
                     <input type="email" name="email" placeholder="Your Email" required>
                     <input type="tel" name="phone" placeholder="Phone Number">
@@ -101,6 +101,10 @@
 
                     <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Initialize Growth System</button>
                 </form>
+                <div id="formStatus" style="display: none; padding: 1.5rem; background: rgba(0,255,255,0.05); border: 1px solid var(--neon-cyan); border-radius: 4px; margin-top: 1rem; color: #fff; text-align: center;">
+                    <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem; font-size: 1.2rem;">System Initialized</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-light);">Your build parameters have been successfully transmitted. Our architects will contact you within 24 hours.</p>
+                </div>
                 <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.8rem; text-align: center;">
                     *Prices are estimates and subject to final scope review.
                 </p>
@@ -160,6 +164,39 @@
                 addon.classList.toggle('selected');
                 updateTotals();
             });
+        });
+
+        // AJAX Formspree Submission
+        const form = document.getElementById('pipelineForm');
+        const formStatus = document.getElementById('formStatus');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Transmitting...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: data,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    form.style.display = 'none';
+                    formStatus.style.display = 'block';
+                } else {
+                    submitBtn.textContent = 'Error. Please Try Again.';
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                submitBtn.textContent = 'Network Error. Please Try Again.';
+                submitBtn.disabled = false;
+            }
         });
     </script>
 </body>
