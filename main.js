@@ -149,6 +149,25 @@ document.addEventListener('DOMContentLoaded', () => {
         let surfaceY;
         let cx, cy;
         
+        function getGroundY(x) {
+            // Left small crater
+            if (x >= cx - 300 && x <= cx - 280) return surfaceY + (x - (cx - 300)) / 20 * 15;
+            if (x > cx - 280 && x < cx - 220) return surfaceY + 15;
+            if (x >= cx - 220 && x <= cx - 200) return surfaceY + 15 - (x - (cx - 220)) / 20 * 15;
+            
+            // Large center crater
+            if (x >= cx - 120 && x <= cx - 90) return surfaceY + (x - (cx - 120)) / 30 * 40;
+            if (x > cx - 90 && x < cx + 90) return surfaceY + 40;
+            if (x >= cx + 90 && x <= cx + 120) return surfaceY + 40 - (x - (cx + 90)) / 30 * 40;
+            
+            // Right small crater
+            if (x >= cx + 200 && x <= cx + 220) return surfaceY + (x - (cx + 200)) / 20 * 15;
+            if (x > cx + 220 && x < cx + 280) return surfaceY + 15;
+            if (x >= cx + 280 && x <= cx + 300) return surfaceY + 15 - (x - (cx + 280)) / 20 * 15;
+            
+            return surfaceY;
+        }
+        
         function resetSim() {
             simState = 'BUILDING';
             shipYOffset = 0;
@@ -289,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 super();
                 this.spriteSize = 5.2; // Scaled up 100%
                 this.x = x - (5 * this.spriteSize) / 2; // Center in crater
-                this.y = y - (5 * this.spriteSize); // Rest perfectly on top of the ground
+                this.y = getGroundY(this.x) - (5 * this.spriteSize) - 2; // Rest perfectly on top of the ground line
                 this.frame = 0;
                 this.timer = 0;
                 this.sprite1 = [
@@ -328,10 +347,11 @@ document.addEventListener('DOMContentLoaded', () => {
         class RoverCadet extends Actor {
             constructor(startX, startY, endX, dir) {
                 super();
+                this.spriteSize = 5.2; // Scaled up 200%
                 this.startX = startX;
-                this.y = startY - 6;
                 this.endX = endX;
                 this.x = startX;
+                this.y = getGroundY(this.x) - (4 * this.spriteSize) - 2;
                 this.dir = dir; // 1 or -1
                 this.speed = 1.2;
                 this.waitTimer = 0;
@@ -355,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 this.x += this.speed * this.dir;
+                this.y = getGroundY(this.x) - (4 * this.spriteSize) - 2; // Follow the crater contour perfectly
                 
                 // If reached destination (center crater edge or spawn)
                 if ((this.dir === 1 && this.x > this.endX) || (this.dir === -1 && this.x < this.endX)) {
