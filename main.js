@@ -195,10 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
         class JetpackCadet {
             constructor() {
                 this.x = width / 2 + (Math.random() - 0.5) * width;
-                this.y = height + 50; 
+                this.y = height - Math.random() * 100 - 50; // Spawn safely on screen above bottom edge
                 this.spriteSize = 3;
-                this.speed = Math.random() * 2 + 2; // Fast direct flight
-                this.state = 'IDLE'; // IDLE, FETCHING, BUILDING, BOARDING, GONE
+                this.speed = Math.random() * 2 + 2; 
+                this.state = 'IDLE'; 
                 this.target = null;
                 this.carryingPart = false;
                 
@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.targetPart = p;
                         this.state = 'FETCHING';
                         // Fly to random point on moon
-                        this.target = { x: width / 2 + (Math.random() - 0.5) * width * 0.8, y: height - Math.random() * 50 };
+                        this.target = { x: width / 2 + (Math.random() - 0.5) * width * 0.8, y: height - Math.random() * 50 - 20 };
                     }
                 }
 
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let dx = this.target.x - this.x;
                     let dy = this.target.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 5) {
+                    if (dist < 15) { // Increased threshold to avoid overshoot vibration
                         this.carryingPart = true;
                         this.state = 'BUILDING';
                         this.target = { x: this.targetPart.x, y: this.targetPart.y };
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let dx = this.target.x - this.x;
                     let dy = this.target.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 5) {
+                    if (dist < 15) {
                         this.targetPart.placed = true;
                         this.targetPart.alpha = 0.9;
                         this.carryingPart = false;
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let dx = this.target.x - this.x;
                     let dy = this.target.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 10) {
+                    if (dist < 15) {
                         this.state = 'GONE'; 
                     } else {
                         this.x += (dx / dist) * this.speed * 2; 
