@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.stroke();
 
                 // Draw Scaffolds in center crater
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 // Left scaffold tower
@@ -240,14 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.moveTo(cx + 80, surfaceY - 30); ctx.lineTo(cx + 60, surfaceY - 10);
                 ctx.moveTo(cx + 80, surfaceY + 10); ctx.lineTo(cx + 60, surfaceY + 30);
                 ctx.stroke();
-
-                // Draw Generator with cyan glow
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(cx - 100, surfaceY + 20, 15, 10);
-                ctx.fillRect(cx + 85, surfaceY + 20, 15, 10);
-                ctx.fillStyle = 'rgba(0, 255, 255, 0.6)'; // Glowing core
-                ctx.fillRect(cx - 95, surfaceY + 22, 5, 5); 
-                ctx.fillRect(cx + 90, surfaceY + 22, 5, 5); 
 
                 // Draw some pixelated texture dots
                 ctx.fillStyle = '#ffffff';
@@ -267,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         class Actor {
             constructor() {
                 this.state = 'WORKING';
-                this.spriteSize = 2; // Scaled up 30% (from 1.5)
+                this.spriteSize = 2.6; // Scaled up another 30%
             }
             drawSprite(ctx, spriteMatrix, px, py, isCyan=false) {
                 ctx.fillStyle = isCyan ? 'rgba(0, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.8)';
