@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let actors = [];
         let simState = 'BUILDING'; // BUILDING, BOARDING, TAKEOFF, RESET
         let shipYOffset = 0;
-        let blockSize = 4;
+        let blockSize = 5; // Scaled up 30% (from 4)
         let surfaceY;
         let cx, cy;
         
@@ -221,6 +221,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 ctx.stroke();
 
+                // Draw Scaffolds in center crater
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                // Left scaffold tower
+                ctx.moveTo(cx - 80, surfaceY + 30); ctx.lineTo(cx - 80, surfaceY - 70);
+                ctx.moveTo(cx - 60, surfaceY + 30); ctx.lineTo(cx - 60, surfaceY - 70);
+                ctx.moveTo(cx - 80, surfaceY - 10); ctx.lineTo(cx - 60, surfaceY - 30);
+                ctx.moveTo(cx - 80, surfaceY - 50); ctx.lineTo(cx - 60, surfaceY - 70);
+                ctx.moveTo(cx - 80, surfaceY - 30); ctx.lineTo(cx - 60, surfaceY - 10);
+                ctx.moveTo(cx - 80, surfaceY + 10); ctx.lineTo(cx - 60, surfaceY + 30);
+                // Right scaffold tower
+                ctx.moveTo(cx + 80, surfaceY + 30); ctx.lineTo(cx + 80, surfaceY - 70);
+                ctx.moveTo(cx + 60, surfaceY + 30); ctx.lineTo(cx + 60, surfaceY - 70);
+                ctx.moveTo(cx + 80, surfaceY - 10); ctx.lineTo(cx + 60, surfaceY - 30);
+                ctx.moveTo(cx + 80, surfaceY - 50); ctx.lineTo(cx + 60, surfaceY - 70);
+                ctx.moveTo(cx + 80, surfaceY - 30); ctx.lineTo(cx + 60, surfaceY - 10);
+                ctx.moveTo(cx + 80, surfaceY + 10); ctx.lineTo(cx + 60, surfaceY + 30);
+                ctx.stroke();
+
+                // Draw Generator with cyan glow
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx - 100, surfaceY + 20, 15, 10);
+                ctx.fillRect(cx + 85, surfaceY + 20, 15, 10);
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.6)'; // Glowing core
+                ctx.fillRect(cx - 95, surfaceY + 22, 5, 5); 
+                ctx.fillRect(cx + 90, surfaceY + 22, 5, 5); 
+
                 // Draw some pixelated texture dots
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(cx - 250, surfaceY + 25, 2, 2);
@@ -239,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         class Actor {
             constructor() {
                 this.state = 'WORKING';
-                this.spriteSize = 1.5;
+                this.spriteSize = 2; // Scaled up 30% (from 1.5)
             }
             drawSprite(ctx, spriteMatrix, px, py, isCyan=false) {
                 ctx.fillStyle = isCyan ? 'rgba(0, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.8)';
@@ -387,8 +415,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         p.targeted = true;
                         this.targetPart = p;
                         this.state = 'FETCHING';
-                        // Fly to small craters to fetch
-                        this.target = { x: cx + (Math.random() > 0.5 ? 250 : -250), y: surfaceY + 15 };
+                        
+                        if (this.isLadder) {
+                            // Fly to small craters to fetch
+                            this.target = { x: cx + (Math.random() > 0.5 ? 250 : -250), y: surfaceY + 15 };
+                        } else {
+                            // Fly from random off-screen places (N, S, E, W, NW, SE, etc)
+                            let edge = Math.floor(Math.random() * 4);
+                            if (edge === 0) this.target = { x: Math.random() * width, y: -100 }; // N
+                            else if (edge === 1) this.target = { x: Math.random() * width, y: height + 100 }; // S
+                            else if (edge === 2) this.target = { x: -100, y: Math.random() * height }; // W
+                            else this.target = { x: width + 100, y: Math.random() * height }; // E
+                        }
                     }
                 }
 
