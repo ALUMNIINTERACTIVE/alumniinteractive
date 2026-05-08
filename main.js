@@ -129,22 +129,120 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        class ColonyBlock {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = 2; // thin 2x2 pixel blocks
+                this.opacity = 0;
+                this.maxOpacity = Math.random() * 0.2 + 0.05; // very faint background structures
+            }
+            update() {
+                if (this.opacity < this.maxOpacity) {
+                    this.opacity += 0.005;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        class AtariCadet {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.pixelSize = 1.5; // Size of each "pixel" in the cadet
+                this.speed = 1.5;
+                this.direction = Math.floor(Math.random() * 4); // 0: up, 1: right, 2: down, 3: left
+                this.moveTimer = 0;
+                this.buildTimer = 0;
+                this.opacity = 0.6;
+                
+                // 5x5 alien sprite
+                this.sprite = [
+                    [0, 1, 0, 1, 0],
+                    [1, 1, 1, 1, 1],
+                    [1, 0, 1, 0, 1],
+                    [1, 1, 1, 1, 1],
+                    [0, 1, 0, 1, 0]
+                ];
+            }
+            update(blocksArray) {
+                this.moveTimer--;
+                if (this.moveTimer <= 0) {
+                    this.direction = Math.floor(Math.random() * 4);
+                    this.moveTimer = Math.random() * 150 + 50;
+                }
+
+                if (this.direction === 0) this.y -= this.speed;
+                if (this.direction === 1) this.x += this.speed;
+                if (this.direction === 2) this.y += this.speed;
+                if (this.direction === 3) this.x -= this.speed;
+
+                // Wrap
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+
+                // Build colony block
+                this.buildTimer--;
+                if (this.buildTimer <= 0) {
+                    // Snap to grid for building to look structured
+                    const gridX = Math.floor(this.x / 4) * 4;
+                    const gridY = Math.floor(this.y / 4) * 4;
+                    // Max limit to prevent infinite lag
+                    if (blocksArray.length < 2000) {
+                        blocksArray.push(new ColonyBlock(gridX, gridY));
+                    }
+                    this.buildTimer = Math.random() * 40 + 10;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                for (let row = 0; row < 5; row++) {
+                    for (let col = 0; col < 5; col++) {
+                        if (this.sprite[row][col] === 1) {
+                            ctx.fillRect(this.x + col * this.pixelSize, this.y + row * this.pixelSize, this.pixelSize, this.pixelSize);
+                        }
+                    }
+                }
+            }
+        }
+
+        let colonyBlocks = [];
+        let cadets = [];
+
         function initParticles() {
             particles = [];
-            let particleCount = Math.floor(width * height / 12000); // Responsive amount
+            let particleCount = Math.floor(width * height / 12000); 
             for (let i = 0; i < particleCount; i++) {
                 particles.push(new Particle());
             }
             
             shootingStars = [];
-            for (let i = 0; i < 3; i++) { // Max 3 shooting stars at a time
+            for (let i = 0; i < 3; i++) { 
                 shootingStars.push(new ShootingStar());
+            }
+
+            cadets = [];
+            colonyBlocks = [];
+            // Spawn 5 cadets
+            for (let i = 0; i < 5; i++) {
+                cadets.push(new AtariCadet());
             }
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, width, height);
             
+            // Draw colony blocks first so they are behind everything
+            colonyBlocks.forEach(block => {
+                block.update();
+                block.draw();
+            });
+
             particles.forEach(p => {
                 p.update();
                 p.draw();
@@ -153,6 +251,11 @@ document.addEventListener('DOMContentLoaded', () => {
             shootingStars.forEach(s => {
                 s.update();
                 s.draw();
+            });
+
+            cadets.forEach(cadet => {
+                cadet.update(colonyBlocks);
+                cadet.draw();
             });
 
             requestAnimationFrame(animateParticles);
