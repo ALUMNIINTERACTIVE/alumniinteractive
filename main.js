@@ -199,6 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1 Digger (moved to flat plateau between left crater and center crater)
             actors.push(new DiggerCadet(cx - 170, 0));
             
+            // 1 Pump (Animated pixel-art pump in the left small crater)
+            actors.push(new Pump(cx - 250));
+            
             // 2 Rovers (desynchronized speeds and start times)
             let r1 = new RoverCadet(-50, 0, cx - 120, 1); // Left to center
             r1.speed = 1.4;
@@ -265,21 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.moveTo(cx + 80, surfaceY - 30); ctx.lineTo(cx + 60, surfaceY - 10);
                 ctx.moveTo(cx + 80, surfaceY + 10); ctx.lineTo(cx + 60, surfaceY + 30);
                 ctx.stroke();
-
-                // Draw Animated Pump in the left small crater
-                let time = Date.now() / 400; // Animation speed
-                let pumpAngle = Math.sin(time) * 0.4; // Oscillation angle
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(cx - 260, surfaceY + 5, 20, 10); // Pump base
-                ctx.fillRect(cx - 252, surfaceY - 15, 4, 20); // Pump tower
-                
-                ctx.save();
-                ctx.translate(cx - 250, surfaceY - 15);
-                ctx.rotate(pumpAngle);
-                ctx.fillRect(-15, -2, 30, 4); // Walking beam
-                ctx.fillRect(13, -2, 2, 15); // Horse head / pump rod
-                ctx.restore();
 
                 // Draw some pixelated texture dots
                 ctx.fillStyle = '#ffffff';
@@ -416,6 +404,67 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.fillStyle = '#fff';
                     ctx.fillRect(this.x + 2, this.y - 3, 4, 4);
                 }
+            }
+        }
+
+        class Pump extends Actor {
+            constructor(x) {
+                super();
+                this.spriteSize = 6; // Scaled up 20% compared to base 5
+                this.x = x - (5 * this.spriteSize) / 2; // Center horizontally
+                this.y = getGroundY(this.x) - (3 * this.spriteSize) - 2; // Rest on ground
+                this.frame = 0;
+                this.timer = 0;
+                
+                this.base = [
+                    [0,1,1,1,0],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
+                ];
+                
+                this.arms = [
+                    [ // Up
+                        [1,1,0,0,0],
+                        [0,1,1,0,0],
+                        [0,0,1,1,1]
+                    ],
+                    [ // Flat
+                        [0,0,0,0,0],
+                        [1,1,1,1,1],
+                        [0,0,0,0,0]
+                    ],
+                    [ // Down
+                        [0,0,1,1,1],
+                        [0,1,1,0,0],
+                        [1,1,0,0,0]
+                    ]
+                ];
+            }
+            update() {
+                this.timer++;
+                if (this.timer > 20) { // Animation speed
+                    this.frame = (this.frame + 1) % 4; // 0=Up, 1=Flat, 2=Down, 3=Flat
+                    this.timer = 0;
+                }
+            }
+            draw(ctx) {
+                // Draw Base
+                this.drawSprite(ctx, this.base, this.x, this.y);
+                
+                // Draw Tower
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(this.x + 2 * this.spriteSize, this.y - 4 * this.spriteSize, this.spriteSize, 4 * this.spriteSize);
+                
+                // Draw Arm
+                let armIndex = this.frame;
+                if (armIndex === 3) armIndex = 1;
+                this.drawSprite(ctx, this.arms[armIndex], this.x, this.y - 6 * this.spriteSize);
+                
+                // Draw Drop Rod
+                let rodY = this.y - 6 * this.spriteSize;
+                if (armIndex === 0) rodY += 2 * this.spriteSize;
+                if (armIndex === 1) rodY += 1 * this.spriteSize;
+                ctx.fillRect(this.x + 4 * this.spriteSize, rodY, this.spriteSize, this.y + 3*this.spriteSize - rodY);
             }
         }
 
