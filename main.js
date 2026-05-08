@@ -129,90 +129,177 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        class ColonyBlock {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.size = 6; // Make blocks larger and more visible
-                this.opacity = 0;
-                this.maxOpacity = Math.random() * 0.4 + 0.15; // More visible background structures
-            }
-            update() {
-                if (this.opacity < this.maxOpacity) {
-                    this.opacity += 0.005;
+        // --- Cinematic Spaceship Animation ---
+        
+        const shipBlueprint = [
+            "       XXXX       ",
+            "    XXXXXXXXXX    ",
+            "  XXXXXXXXXXXXXX  ",
+            " XXXXXXXXXXXXXXXX ",
+            "XXXXXXXXXXXXXXXXXX",
+            " XXXXXXXXXXXXXXXX ",
+            "    XXXXXXXXXX    "
+        ];
+        
+        let shipParts = [];
+        let cadets = [];
+        let simState = 'BUILDING'; // BUILDING, BOARDING, TAKEOFF, RESET
+        let shipYOffset = 0;
+        let blockSize = 8;
+        
+        function resetSim() {
+            simState = 'BUILDING';
+            shipYOffset = 0;
+            shipParts = [];
+            
+            // Generate blueprint coordinates
+            const startX = width / 2 - (shipBlueprint[0].length * blockSize) / 2;
+            const startY = height / 3 - 50;
+            
+            for (let row = 0; row < shipBlueprint.length; row++) {
+                for (let col = 0; col < shipBlueprint[row].length; col++) {
+                    if (shipBlueprint[row][col] === 'X') {
+                        shipParts.push({
+                            x: startX + col * blockSize,
+                            y: startY + row * blockSize,
+                            placed: false,
+                            targeted: false,
+                            alpha: 0
+                        });
+                    }
                 }
             }
-            draw() {
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                ctx.fillRect(this.x, this.y, this.size, this.size);
+            
+            cadets = [];
+            for(let i = 0; i < 15; i++) {
+                cadets.push(new JetpackCadet());
             }
         }
 
-        class AtariCadet {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.pixelSize = 4; // Make the aliens much larger
-                this.speed = 1.5;
-                this.direction = Math.floor(Math.random() * 4); // 0: up, 1: right, 2: down, 3: left
-                this.moveTimer = 0;
-                this.buildTimer = 0;
-                this.opacity = 0.8; // Make them brighter
+        class Moon {
+            draw(ctx, w, h) {
+                // Draw a pixelated-style massive arc for the moon surface
+                ctx.fillStyle = '#0a0a0c'; // slightly bluish dark grey
+                ctx.beginPath();
+                ctx.arc(w / 2, h + w * 0.8, w * 0.9, 0, Math.PI * 2);
+                ctx.fill();
                 
-                // 5x5 alien sprite
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+            }
+        }
+        
+        const moon = new Moon();
+
+        class JetpackCadet {
+            constructor() {
+                this.x = width / 2 + (Math.random() - 0.5) * width;
+                this.y = height + 50; 
+                this.spriteSize = 3;
+                this.speed = Math.random() * 2 + 2; // Fast direct flight
+                this.state = 'IDLE'; // IDLE, FETCHING, BUILDING, BOARDING, GONE
+                this.target = null;
+                this.carryingPart = false;
+                
+                // 5x5 alien sprite with jetpack legs
                 this.sprite = [
                     [0, 1, 0, 1, 0],
                     [1, 1, 1, 1, 1],
                     [1, 0, 1, 0, 1],
                     [1, 1, 1, 1, 1],
-                    [0, 1, 0, 1, 0]
+                    [1, 0, 0, 0, 1] 
                 ];
             }
-            update(blocksArray) {
-                this.moveTimer--;
-                if (this.moveTimer <= 0) {
-                    this.direction = Math.floor(Math.random() * 4);
-                    this.moveTimer = Math.random() * 150 + 50;
+            
+            update(parts) {
+                if (this.state === 'GONE') return;
+
+                if (simState === 'BOARDING' && this.state !== 'BOARDING') {
+                    this.state = 'BOARDING';
+                    this.target = { x: width / 2, y: height / 3 }; 
                 }
 
-                if (this.direction === 0) this.y -= this.speed;
-                if (this.direction === 1) this.x += this.speed;
-                if (this.direction === 2) this.y += this.speed;
-                if (this.direction === 3) this.x -= this.speed;
-
-                // Wrap
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = 0;
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = 0;
-
-                // Build colony block
-                this.buildTimer--;
-                if (this.buildTimer <= 0) {
-                    // Snap to grid for building to look structured
-                    const gridX = Math.floor(this.x / 6) * 6;
-                    const gridY = Math.floor(this.y / 6) * 6;
-                    // Max limit to prevent infinite lag
-                    if (blocksArray.length < 2500) {
-                        blocksArray.push(new ColonyBlock(gridX, gridY));
+                if (this.state === 'IDLE') {
+                    let unplaced = parts.filter(p => !p.placed && !p.targeted);
+                    if (unplaced.length > 0) {
+                        let p = unplaced[Math.floor(Math.random() * unplaced.length)];
+                        p.targeted = true;
+                        this.targetPart = p;
+                        this.state = 'FETCHING';
+                        // Fly to random point on moon
+                        this.target = { x: width / 2 + (Math.random() - 0.5) * width * 0.8, y: height - Math.random() * 50 };
                     }
-                    this.buildTimer = Math.random() * 40 + 10;
+                }
+
+                if (this.state === 'FETCHING') {
+                    let dx = this.target.x - this.x;
+                    let dy = this.target.y - this.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 5) {
+                        this.carryingPart = true;
+                        this.state = 'BUILDING';
+                        this.target = { x: this.targetPart.x, y: this.targetPart.y };
+                    } else {
+                        this.x += (dx / dist) * this.speed;
+                        this.y += (dy / dist) * this.speed;
+                    }
+                }
+
+                if (this.state === 'BUILDING') {
+                    let dx = this.target.x - this.x;
+                    let dy = this.target.y - this.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 5) {
+                        this.targetPart.placed = true;
+                        this.targetPart.alpha = 0.9;
+                        this.carryingPart = false;
+                        this.state = 'IDLE';
+                    } else {
+                        this.x += (dx / dist) * this.speed;
+                        this.y += (dy / dist) * this.speed;
+                    }
+                }
+
+                if (this.state === 'BOARDING') {
+                    let dx = this.target.x - this.x;
+                    let dy = this.target.y - this.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 10) {
+                        this.state = 'GONE'; 
+                    } else {
+                        this.x += (dx / dist) * this.speed * 2; 
+                        this.y += (dy / dist) * this.speed * 2;
+                    }
                 }
             }
-            draw() {
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            
+            draw(ctx) {
+                if (this.state === 'GONE') return;
+                
+                ctx.fillStyle = `rgba(255, 255, 255, 0.8)`;
                 for (let row = 0; row < 5; row++) {
                     for (let col = 0; col < 5; col++) {
                         if (this.sprite[row][col] === 1) {
-                            ctx.fillRect(this.x + col * this.pixelSize, this.y + row * this.pixelSize, this.pixelSize, this.pixelSize);
+                            ctx.fillRect(this.x + col * this.spriteSize, this.y + row * this.spriteSize, this.spriteSize, this.spriteSize);
                         }
                     }
                 }
+                
+                // Jetpack cyan thrust
+                if (this.state === 'FETCHING' || this.state === 'BUILDING' || this.state === 'BOARDING') {
+                    ctx.fillStyle = `rgba(0, 255, 255, ${Math.random() * 0.5 + 0.3})`; 
+                    ctx.fillRect(this.x, this.y + 5 * this.spriteSize, this.spriteSize, this.spriteSize * (Math.random() * 3 + 1));
+                    ctx.fillRect(this.x + 4 * this.spriteSize, this.y + 5 * this.spriteSize, this.spriteSize, this.spriteSize * (Math.random() * 3 + 1));
+                }
+                
+                // Part carried
+                if (this.carryingPart) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(this.x + 2 * this.spriteSize, this.y - 2 * this.spriteSize, blockSize, blockSize);
+                }
             }
         }
-
-        let colonyBlocks = [];
-        let cadets = [];
 
         function initParticles() {
             particles = [];
@@ -226,36 +313,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 shootingStars.push(new ShootingStar());
             }
 
-            cadets = [];
-            colonyBlocks = [];
-            // Spawn 15 cadets to make them very noticeable
-            for (let i = 0; i < 15; i++) {
-                cadets.push(new AtariCadet());
-            }
+            resetSim();
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, width, height);
             
-            // Draw colony blocks first so they are behind everything
-            colonyBlocks.forEach(block => {
-                block.update();
-                block.draw();
+            // Draw regular background particles
+            particles.forEach(p => { p.update(); p.draw(); });
+            shootingStars.forEach(s => { s.update(); s.draw(); });
+
+            // Draw moon
+            moon.draw(ctx, width, height);
+
+            // Simulation Logic
+            if (simState === 'BUILDING') {
+                let allPlaced = shipParts.every(p => p.placed);
+                if (allPlaced) {
+                    simState = 'BOARDING';
+                    setTimeout(() => { simState = 'TAKEOFF'; }, 3000);
+                }
+            } else if (simState === 'TAKEOFF') {
+                shipYOffset -= 4; // Accelerate upwards
+                
+                // Draw massive cyan thruster
+                ctx.fillStyle = `rgba(0, 255, 255, ${Math.random() * 0.4 + 0.1})`;
+                ctx.beginPath();
+                ctx.moveTo(width / 2 - 40, height / 3 + 10 + shipYOffset);
+                ctx.lineTo(width / 2 + 40, height / 3 + 10 + shipYOffset);
+                ctx.lineTo(width / 2, height / 3 + 150 + shipYOffset + Math.random() * 100);
+                ctx.fill();
+
+                if (shipYOffset < -height) {
+                    simState = 'RESET';
+                    setTimeout(() => { resetSim(); }, 2000);
+                }
+            }
+
+            // Draw Ship Parts
+            shipParts.forEach(p => {
+                if (p.placed) {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+                    ctx.fillRect(p.x, p.y + shipYOffset, blockSize, blockSize);
+                }
             });
 
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-
-            shootingStars.forEach(s => {
-                s.update();
-                s.draw();
-            });
-
+            // Update and Draw Cadets
             cadets.forEach(cadet => {
-                cadet.update(colonyBlocks);
-                cadet.draw();
+                cadet.update(shipParts);
+                cadet.draw(ctx);
             });
 
             requestAnimationFrame(animateParticles);
