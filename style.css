@@ -530,11 +530,13 @@ footer {
     padding: 1rem;
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    max-width: 600px;
+    max-width: 400px;
     width: 100%;
 }
 .demo-frame img, .demo-frame video {
     width: 100%;
+    max-height: 500px;
+    object-fit: contain;
     border-radius: 8px;
     display: block;
 }
