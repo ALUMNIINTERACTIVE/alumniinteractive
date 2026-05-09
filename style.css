@@ -511,3 +511,30 @@ footer {
     outline: none;
     border-color: var(--neon-cyan);
 }
+/* Demos Section */
+#demos {
+    padding: 6rem 0;
+    position: relative;
+    z-index: 2;
+}
+.demo-container {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.demo-frame {
+    background: rgba(10, 10, 10, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    max-width: 600px;
+    width: 100%;
+}
+.demo-frame img, .demo-frame video {
+    width: 100%;
+    border-radius: 8px;
+    display: block;
+}
