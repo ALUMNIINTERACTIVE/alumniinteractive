@@ -521,6 +521,7 @@ footer {
     display: flex;
     gap: 2rem;
     justify-content: center;
+    align-items: stretch;
     flex-wrap: wrap;
 }
 .demo-frame {
@@ -530,12 +531,16 @@ footer {
     padding: 1rem;
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    max-width: 280px;
-    width: 100%;
+    flex: 1 1 300px;
+    max-width: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .demo-frame img, .demo-frame video {
     width: 100%;
-    max-height: 450px;
+    height: 100%;
+    max-height: 550px;
     object-fit: contain;
     border-radius: 8px;
     display: block;
