@@ -15,7 +15,7 @@ export class P2PNode {
     this.p2pPort = p2pPort;
     
     // Create TCP server for inbound connections
-    const bindHost = process.env.BIND_HOST || '127.0.0.1';
+    const bindHost = process.env.BIND_HOST || '0.0.0.0';
     const server = net.createServer((socket) => this.initConnection(socket));
     server.listen(this.p2pPort, bindHost, () => {
       console.log(`🌐 P2P Node listening for peer connections on ${bindHost}:${this.p2pPort}`);

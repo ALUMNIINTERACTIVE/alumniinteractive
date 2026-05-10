@@ -116,7 +116,7 @@ export class HttpApi {
       }
     });
 
-    const bindHost = process.env.BIND_HOST || '127.0.0.1';
+    const bindHost = process.env.BIND_HOST || '0.0.0.0';
     server.listen(this.httpPort, bindHost, () => {
       console.log(`📡 HTTP API listening on http://${bindHost}:${this.httpPort}`);
     });
