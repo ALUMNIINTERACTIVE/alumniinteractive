@@ -1,4 +1,9 @@
-const API_URL = 'http://network.alumniinteractive.com:3001';
+const API_ENDPOINTS = [
+    'http://network.alumniinteractive.com:3001',
+    'http://10.0.0.99:3001',
+    'http://127.0.0.1:3001'
+];
+let API_URL = '';
 
 // DOM Elements
 const views = document.querySelectorAll('.view');
@@ -161,6 +166,36 @@ btnSendTx.addEventListener('click', async () => {
     }
 });
 
-// Start auto-refresh loop
-fetchNetworkData();
-setInterval(fetchNetworkData, 3000);
+async function initDashboard() {
+    document.querySelector('.status-indicator').style.background = '#eab308'; // searching yellow
+    document.querySelector('.status-indicator').style.boxShadow = '0 0 8px #eab308';
+    
+    for (const endpoint of API_ENDPOINTS) {
+        try {
+            // Fast ping with 1.5s timeout
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 1500);
+            
+            const res = await fetch(`${endpoint}/blocks`, { signal: controller.signal });
+            clearTimeout(id);
+            
+            if (res.ok) {
+                API_URL = endpoint;
+                console.log('Connected to Node:', API_URL);
+                document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator"></div>Node Connected<br><span style="font-size:0.7rem;opacity:0.6">${API_URL}</span>`;
+                break;
+            }
+        } catch (e) {
+            console.log(`Endpoint ${endpoint} unreachable, falling back...`);
+        }
+    }
+    
+    if (!API_URL) {
+        API_URL = API_ENDPOINTS[0]; // Default fail state
+    }
+
+    fetchNetworkData();
+    setInterval(fetchNetworkData, 3000);
+}
+
+initDashboard();
