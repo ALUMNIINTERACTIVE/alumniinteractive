@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALUMNI Web3 Ecosystem</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Cryptography Library for secp256k1 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="brand">
+                <div class="logo-glow"></div>
+                <h1>ALUMNI</h1>
+                <span class="badge">MAINNET</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="active" data-view="explorer">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    Explorer
+                </li>
+                <li data-view="wallet">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+                    Web Wallet
+                </li>
+            </ul>
+
+            <div class="node-status">
+                <div class="status-indicator"></div>
+                <span>Node Connected</span>
+                <small id="node-url">network.alumniinteractive.com:3001</small>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- VIEW: EXPLORER -->
+            <section id="view-explorer" class="view active">
+                <header class="view-header">
+                    <h2>Network Overview</h2>
+                    <div class="network-stats">
+                        <div class="stat-box glass-panel">
+                            <label>Latest Block</label>
+                            <span id="stat-block-height">0</span>
+                        </div>
+                        <div class="stat-box glass-panel">
+                            <label>Active Validators</label>
+                            <span id="stat-validators">0</span>
+                        </div>
+                        <div class="stat-box glass-panel">
+                            <label>Pending TXs</label>
+                            <span id="stat-pending">0</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="dashboard-grid">
+                    <div class="card glass-panel span-2">
+                        <h3>Live Ledger (Recent Blocks)</h3>
+                        <div class="table-container">
+                            <table id="blocks-table">
+                                <thead>
+                                    <tr>
+                                        <th>Block Hash</th>
+                                        <th>Age</th>
+                                        <th>TXs</th>
+                                        <th>Validator</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: WALLET -->
+            <section id="view-wallet" class="view">
+                <header class="view-header">
+                    <h2>Decentralized Wallet</h2>
+                    <p class="subtitle">Securely manage your assets and sign transactions locally.</p>
+                </header>
+
+                <div class="dashboard-grid wallet-grid">
+                    <!-- Key Management -->
+                    <div class="card glass-panel">
+                        <h3>Wallet Identity</h3>
+                        <div class="key-display">
+                            <label>Public Key (Address)</label>
+                            <div class="copyable-field" id="wallet-pub">Not Generated</div>
+                            <label>Private Key</label>
+                            <div class="copyable-field secret" id="wallet-priv">Not Generated</div>
+                        </div>
+                        <div class="button-group">
+                            <button id="btn-generate-wallet" class="btn primary glow">Generate New Wallet</button>
+                            <button id="btn-import-wallet" class="btn secondary">Import Private Key</button>
+                        </div>
+                    </div>
+
+                    <!-- Balance & Actions -->
+                    <div class="card glass-panel">
+                        <h3>Asset Balance</h3>
+                        <div class="balance-display">
+                            <span class="amount" id="wallet-balance">0.00</span>
+                            <span class="currency">ALUMNI</span>
+                        </div>
+                        
+                        <div class="transaction-form">
+                            <h4>Send Transaction</h4>
+                            <input type="text" id="tx-to" placeholder="Recipient Public Key" class="input-field">
+                            <input type="number" id="tx-amount" placeholder="Amount" class="input-field">
+                            <button id="btn-send-tx" class="btn primary full-width">Sign & Send</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

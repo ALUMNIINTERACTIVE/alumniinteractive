@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  alumni-mainnet-node:
+    build: .
+    container_name: alumni-node
+    restart: unless-stopped
+    ports:
+      - "3001:3001" # HTTP API
+      - "6001:6001" # P2P Socket
+    environment:
+      # The IP address the node should bind to inside the container
+      - BIND_HOST=0.0.0.0
+      
+      # Optional: To connect to an existing network, add a peer's public IP here
+      # - PEERS=198.51.100.12:6001
+    volumes:
+      # Persist the blockchain ledger data to the host machine
+      - ./alumni-data:/app/data
