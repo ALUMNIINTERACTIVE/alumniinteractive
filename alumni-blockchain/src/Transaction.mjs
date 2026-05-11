@@ -60,8 +60,6 @@ export class Transaction {
     if (!this.signature || this.signature.length === 0) {
       throw new Error('No signature in this transaction');
     }
-      throw new Error('No signature in this transaction');
-    }
 
     const hashTx = this.calculateHash();
     const verify = createVerify('SHA256');
