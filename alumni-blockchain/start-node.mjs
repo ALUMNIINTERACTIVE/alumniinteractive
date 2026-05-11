@@ -16,9 +16,25 @@ if (process.env.PEERS === 'none') {
 
 // Initialize network components
 
-// Generate a wallet for this specific node to act as a Validator
-const nodeWallet = new Wallet();
-console.log(`🔐 Node Validator Public Key generated`);
+// Generate or load a wallet for this specific node to act as a Validator
+import fs from 'fs';
+let nodeWallet;
+const walletFile = 'alumni_node_wallet.json';
+
+if (fs.existsSync(walletFile)) {
+    const savedWallet = JSON.parse(fs.readFileSync(walletFile, 'utf8'));
+    nodeWallet = new Wallet();
+    nodeWallet.publicKey = savedWallet.publicKey;
+    nodeWallet.privateKey = savedWallet.privateKey;
+    console.log(`🔐 Persistent Node Validator loaded (${nodeWallet.publicKey.substring(0, 40)}...)`);
+} else {
+    nodeWallet = new Wallet();
+    fs.writeFileSync(walletFile, JSON.stringify({
+        publicKey: nodeWallet.publicKey,
+        privateKey: nodeWallet.privateKey
+    }, null, 2));
+    console.log(`🔐 New Node Validator Wallet generated and saved to ${walletFile}`);
+}
 
 const alumniCoin = new Blockchain();
 const p2pServer = new P2PNode(alumniCoin, p2pPort, initialPeers);
@@ -32,7 +48,6 @@ const totalStaked = Object.values(alumniCoin.validators).reduce((a, b) => a + b,
 if (alumniCoin.chain.length === 1 && totalStaked === 0) {
     console.log('🌱 Network is fresh. Bootstrapping Genesis Node & Treasury...');
     const { Transaction, TransactionType } = await import('./src/Transaction.mjs');
-    const fs = await import('fs');
     
     // 1. Set the ALUMNI Ecosystem Treasury Wallet (@ALUMNI.SATOSHI)
     const treasuryPublicKey = "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAENwPfFbba+A9l6uFutbQucAOUgPQNujNn\nTl+oXgr5F0U+SPynvHJbC07kXms5iYwEAtqT1D3ErWnPX+a6XE7NtQ==\n-----END PUBLIC KEY-----\n";
