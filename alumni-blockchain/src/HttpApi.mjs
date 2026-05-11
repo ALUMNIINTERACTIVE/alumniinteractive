@@ -71,6 +71,32 @@ export class HttpApi {
           res.end(JSON.stringify({ error: error.message }));
         }
       }
+      else if (req.method === 'POST' && req.url === '/stake') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+          try {
+            const txData = JSON.parse(body);
+            // Reconstruct the transaction
+            const tx = new Transaction(txData.fromAddress, txData.toAddress, txData.amount, Transaction.STAKE);
+            tx.signature = txData.signature;
+            
+            // Assuming 50 ALUMNI is the required minimum to stake
+            if (tx.amount < 50) {
+              throw new Error("A minimum of 50 ALUMNI is required to stake.");
+            }
+
+            this.blockchain.addTransaction(tx);
+            this.p2pNode.broadcastTransaction(tx);
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Stake transaction successfully added to pending pool' }));
+          } catch (error) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: error.message }));
+          }
+        });
+      }
       else if (req.method === 'POST' && req.url === '/transaction') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
