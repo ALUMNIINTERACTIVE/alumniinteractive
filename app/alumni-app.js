@@ -156,7 +156,7 @@ navLinks.forEach(link => {
 async function fetchNetworkData() {
     try {
         const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), 4000);
+        const id = setTimeout(() => controller.abort(), 10000);
         
         // Fetch Blocks
         const blocksRes = await fetch(`${API_URL}/blocks?t=${Date.now()}`, { 
@@ -814,7 +814,7 @@ async function initDashboard() {
         try {
             // Ping with 4s timeout (Mobile + Ngrok can be slower on first connection)
             const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 4000);
+            const id = setTimeout(() => controller.abort(), 10000);
             
             const res = await fetch(`${endpoint}/blocks?t=${Date.now()}`, { 
                 signal: controller.signal,
