@@ -7,7 +7,12 @@ export class Blockchain {
   constructor() {
     this.chain = [];
     this.pendingTransactions = [];
-    this.validatorReward = 50; // Block reward for validators
+    
+    // --- 2026 TOKENOMICS ---
+    this.MAX_SUPPLY = 100000000;       // 100M ALUMNI Hard Cap
+    this.HALVING_BLOCKS = 25228800;    // ~4 years at 5s blocks
+    this.GAS_FEE = 0.01;               // 0.01 ALUMNI Network Fee
+    this.totalSupply = 0;              // Dynamically calculated
     
     this.vm = new AlumniVM();
     this.validators = {}; // address -> amount staked
@@ -25,6 +30,15 @@ export class Blockchain {
 
   createGenesisBlock() {
     return new Block(Date.parse('2026-05-09'), [], '0', null);
+  }
+
+  getValidatorReward() {
+    const halvings = Math.floor(this.chain.length / this.HALVING_BLOCKS);
+    let reward = 50 / Math.pow(2, halvings);
+    if (this.totalSupply + reward > this.MAX_SUPPLY) {
+        reward = this.MAX_SUPPLY - this.totalSupply;
+    }
+    return Math.max(0, reward);
   }
 
   getLatestBlock() {
@@ -60,9 +74,26 @@ export class Blockchain {
         throw new Error('Only registered validators with a stake can propose blocks');
     }
 
+    // Calculate Gas Fee Tips and Burn
+    let totalTips = 0;
+    for (const tx of this.pendingTransactions) {
+        if (tx.fromAddress !== null && tx.fromAddress !== 'NETWORK_FEES') {
+            totalTips += (this.GAS_FEE / 2);
+        }
+    }
+
     // Add block reward for the validator
-    const rewardTx = new Transaction(null, validatorAddress, this.validatorReward);
-    this.pendingTransactions.push(rewardTx);
+    let currentReward = this.getValidatorReward();
+    if (currentReward > 0) {
+        const rewardTx = new Transaction(null, validatorAddress, currentReward);
+        this.pendingTransactions.push(rewardTx);
+        this.totalSupply += currentReward; // Track newly minted ALUMNI
+    }
+
+    if (totalTips > 0) {
+        const tipTx = new Transaction('NETWORK_FEES', validatorAddress, totalTips);
+        this.pendingTransactions.push(tipTx);
+    }
 
     const block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash, validatorAddress);
     
@@ -104,11 +135,11 @@ export class Blockchain {
     const txExists = this.pendingTransactions.find(tx => tx.signature === transaction.signature);
     if (txExists) return false;
 
-    // Verify balance for transfers and stakes
+    // Verify balance for transfers and stakes (including Gas Fee)
     if (transaction.type === TransactionType.TRANSFER || transaction.type === TransactionType.STAKE) {
       const senderBalance = this.getBalanceOfAddress(transaction.fromAddress);
-      if (senderBalance < transaction.amount) {
-        throw new Error(`Not enough balance. Sender has ${senderBalance} ALUMNI.`);
+      if (senderBalance < transaction.amount + this.GAS_FEE) {
+        throw new Error(`Not enough balance to cover amount and ${this.GAS_FEE} ALUMNI gas fee. Sender has ${senderBalance} ALUMNI.`);
       }
     }
 
@@ -120,7 +151,12 @@ export class Blockchain {
     let balance = 0;
     for (const block of this.chain) {
       for (const trans of block.transactions) {
-        if (trans.fromAddress === address) balance -= trans.amount;
+        if (trans.fromAddress === address) {
+            balance -= trans.amount;
+            if (trans.fromAddress !== null && trans.fromAddress !== 'NETWORK_FEES') {
+                balance -= this.GAS_FEE;
+            }
+        }
         if (trans.toAddress === address) balance += trans.amount;
       }
     }
@@ -140,6 +176,7 @@ export class Blockchain {
   }
 
   replaceChain(newChainData) {
+    let recalculatedSupply = 0;
     const revivedChain = newChainData.map(blockData => {
       const block = new Block(blockData.timestamp, [], blockData.previousHash, blockData.validator);
       block.hash = blockData.hash;
@@ -149,10 +186,15 @@ export class Blockchain {
         const tx = new Transaction(txData.fromAddress, txData.toAddress, txData.amount, txData.type, txData.payload);
         tx.timestamp = txData.timestamp;
         tx.signature = txData.signature;
+        
+        if (tx.fromAddress === null) recalculatedSupply += tx.amount;
+        
         return tx;
       });
       return block;
     });
+    
+    this.totalSupply = recalculatedSupply;
 
     if (revivedChain.length <= this.chain.length) {
       console.log('❌ Received chain is not longer than current chain.');

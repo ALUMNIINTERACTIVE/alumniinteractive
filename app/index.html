@@ -40,6 +40,10 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
                     DEX Swap
                 </li>
+                <li data-view="docs">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    Documentation
+                </li>
             </ul>
 
             <div class="node-status">
@@ -228,6 +232,50 @@
                     </div>
                 </div>
             </section>
+            
+            <!-- Documentation View -->
+            <section id="view-docs" class="view">
+                <header class="section-header">
+                    <h2>ALUMNI Protocol</h2>
+                    <p class="subtitle">Architecture, Economics, and Developer Guide</p>
+                </header>
+
+                <div class="content-grid" style="grid-template-columns: 1fr;">
+                    <!-- Tokenomics Card -->
+                    <div class="glass-card full-width">
+                        <h3>Tokenomics (2026 Blueprint)</h3>
+                        <p class="subtitle">The ALUMNI network employs an "Ultra Sound" deflationary economic model designed to strictly limit supply and heavily reward early validators.</p>
+                        
+                        <div style="margin-top: 20px;">
+                            <h4 style="color: var(--primary-color);">1. Hard Cap (Absolute Scarcity)</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-secondary);">The ALUMNI blockchain has an immutable max supply of <strong>100,000,000 ALUMNI</strong>. Once 100M coins are minted, the code physically prevents any further issuance. Validators will then survive purely on gas fees.</p>
+
+                            <h4 style="color: var(--primary-color);">2. Genesis Treasury</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-secondary);">To fund ecosystem growth and DEX liquidity, exactly <strong>10% (10,000,000 ALUMNI)</strong> was pre-mined in the Genesis block and permanently assigned to the @ALUMNI.SATOSHI Treasury Wallet.</p>
+
+                            <h4 style="color: var(--primary-color);">3. Four-Year Halving Schedule</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-secondary);">Block rewards started at 50 ALUMNI per block. Every <strong>25,228,800 blocks</strong> (roughly 4 years), the block reward is mathematically cut in half.</p>
+
+                            <h4 style="color: var(--primary-color);">4. Deflationary Gas Burn</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-secondary);">Every transaction on the network costs a flat Gas Fee of <strong>0.01 ALUMNI</strong>. 50% of this fee is tipped to the Validator who mines the block. The other 50% is <strong>permanently burned</strong> from the total supply.</p>
+                        </div>
+                    </div>
+
+                    <!-- How to Use Card -->
+                    <div class="glass-card full-width">
+                        <h3>How to Use the Network</h3>
+                        <p class="subtitle">A quick-start guide to the ALUMNI Web3 Ecosystem.</p>
+                        
+                        <ul style="margin-top: 20px; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; padding-left: 20px;">
+                            <li><strong>Create an Identity:</strong> Go to the Web Wallet tab and click "Generate New Web3 Wallet". Set your custom <code>@ALUMNI.TAG</code> so friends can easily send you funds.</li>
+                            <li><strong>Receive Funds:</strong> Click your alias in the wallet to silently copy your raw Public Key, or click "Share Address" to send your QR code or Tag to someone else.</li>
+                            <li><strong>Send Transactions:</strong> You can paste an Alias or scan a friend's QR code. The system will automatically resolve the identity and process the transfer.</li>
+                            <li><strong>Mint Custom Tokens:</strong> Navigate to the DEX Swap tab. Input a Token Ticker (e.g., "USDT") and an amount to deploy your very own ALC-20 smart contract instantly.</li>
+                            <li><strong>Become a Validator:</strong> The ALUMNI network runs on Proof-of-Stake. Navigate to your Web Wallet, enter an amount, and stake at least <strong>50 ALUMNI</strong> to turn your device into an active network validator!</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
 
         </main>
     </div>
@@ -241,6 +289,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=7"></script>
 </body>
 </html>

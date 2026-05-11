@@ -458,7 +458,7 @@ btnStakeTx.addEventListener('click', async () => {
     
     const amount = parseFloat(document.getElementById('tx-stake-amount').value);
     
-    if (!amount || amount <= 0) return alert('Invalid stake amount');
+    if (!amount || amount < 50) return alert('Minimum stake is 50 ALUMNI to become a validator.');
 
     try {
         const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
