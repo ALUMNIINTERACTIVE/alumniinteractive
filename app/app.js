@@ -181,9 +181,7 @@ async function fetchNetworkData() {
         }
 
     } catch (err) {
-        console.error('Failed to connect to node:', err);
-        document.querySelector('.status-indicator').style.background = '#ef4444';
-        document.querySelector('.status-indicator').style.boxShadow = '0 0 8px #ef4444';
+        document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator" style="background: #ef4444; box-shadow: 0 0 8px #ef4444;"></div>Node Offline<br><span style="font-size:0.7rem;opacity:0.6">Check Windows PC</span>`;
     }
 }
 
