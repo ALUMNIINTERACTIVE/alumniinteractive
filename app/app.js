@@ -303,6 +303,7 @@ pubKeyField.addEventListener('click', async () => {
 });
 
 const btnEditTag = document.getElementById('btn-edit-tag');
+if (btnEditTag) {
 btnEditTag.addEventListener('click', () => {
     if (!currentWallet) return;
     const currentTag = (currentWallet.alias && !currentWallet.alias.startsWith('Wallet ') && !currentWallet.alias.startsWith('Imported Wallet ')) ? currentWallet.alias : "";
@@ -324,8 +325,10 @@ btnEditTag.addEventListener('click', () => {
         pubKeyField.textContent = formatAlias(currentWallet.publicKey);
     }
 });
+}
 
 const btnSharePub = document.getElementById('btn-share-pub');
+if (btnSharePub) {
 btnSharePub.addEventListener('click', async () => {
     if (!currentWallet) return;
     // We must share the exact cryptographic string (PEM format) including headers, 
@@ -344,7 +347,9 @@ btnSharePub.addEventListener('click', async () => {
         alert("Web Share API is not supported on this browser/device.");
     }
 });
+}
 
+if (togglePrivKey) {
 togglePrivKey.addEventListener('click', () => {
     if (privKeyField.style.filter === 'blur(5px)') {
         privKeyField.style.filter = 'none';
@@ -356,10 +361,12 @@ togglePrivKey.addEventListener('click', () => {
         togglePrivKey.textContent = '[Show]';
     }
 });
+}
 
 const btnDisconnectWallet = document.getElementById('btn-disconnect-wallet');
+if (btnDisconnectWallet) {
 btnDisconnectWallet.addEventListener('click', () => {
-    alumniWallets = [];
+    localStorage.removeItem('alumni_active_wallet_idx');
     currentWallet = null;
     localStorage.removeItem('alumni_wallets');
     localStorage.removeItem('alumni_active_wallet_idx');
