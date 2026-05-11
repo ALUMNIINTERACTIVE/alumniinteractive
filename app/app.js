@@ -478,8 +478,9 @@ const btnScanQr = document.getElementById('btn-scan-qr');
 const qrModal = document.getElementById('qr-scanner-modal');
 const btnCloseScanner = document.getElementById('btn-close-scanner');
 
-btnScanQr.addEventListener('click', (e) => {
-    e.preventDefault();
+if (btnScanQr) {
+    btnScanQr.addEventListener('click', (e) => {
+        e.preventDefault();
     qrModal.style.display = 'flex';
     
     // Initialize Scanner
@@ -510,6 +511,7 @@ btnScanQr.addEventListener('click', (e) => {
         // Parse error, ignore
     });
 });
+}
 
 function closeScanner() {
     qrModal.style.display = 'none';
@@ -521,10 +523,12 @@ function closeScanner() {
     }
 }
 
-btnCloseScanner.addEventListener('click', (e) => {
-    e.preventDefault();
-    closeScanner();
-});
+if (btnCloseScanner) {
+    btnCloseScanner.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeScanner();
+    });
+}
 
 
 function updateWalletBalance(blocks) {
