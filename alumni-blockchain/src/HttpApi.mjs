@@ -12,7 +12,7 @@ export class HttpApi {
       // CORS headers
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, ngrok-skip-browser-warning');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, ngrok-skip-browser-warning, Cache-Control');
 
       if (req.method === 'OPTIONS') {
         res.writeHead(200);
