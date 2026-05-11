@@ -21,9 +21,18 @@ export class HttpApi {
       }
 
       if (req.method === 'GET' && req.url === '/blocks') {
+        // Strip trailing newlines from addresses so frontend string matching always succeeds
+        const cleanChain = this.blockchain.chain.map(block => ({
+            ...block,
+            transactions: block.transactions.map(tx => ({
+                ...tx,
+                fromAddress: tx.fromAddress ? tx.fromAddress.trim() : null,
+                toAddress: tx.toAddress ? tx.toAddress.trim() : null
+            }))
+        }));
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(this.blockchain.chain, null, 2));
-      } 
+        res.end(JSON.stringify(cleanChain, null, 2));
+      }
       else if (req.method === 'GET' && req.url === '/pending-transactions') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(this.blockchain.pendingTransactions, null, 2));
