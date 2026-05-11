@@ -64,6 +64,10 @@ export class P2PNode {
       this.sockets = this.sockets.filter(s => s !== socket);
     });
 
+    socket.on('error', (err) => {
+      // Catch ECONNRESET and other socket errors so the node doesn't crash
+    });
+
     // Request the latest block from the new peer
     this.write(socket, { type: MessageType.QUERY_LATEST });
   }
