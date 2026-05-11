@@ -159,7 +159,7 @@ async function fetchNetworkData() {
         const id = setTimeout(() => controller.abort(), 4000);
         
         // Fetch Blocks
-        const blocksRes = await fetch(`${API_URL}/blocks`, { 
+        const blocksRes = await fetch(`${API_URL}/blocks?t=${Date.now()}`, { 
             signal: controller.signal,
             cache: 'no-store',
             headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
@@ -167,7 +167,7 @@ async function fetchNetworkData() {
         const blocks = await blocksRes.json();
         
         // Fetch Pending TXs
-        const pendingRes = await fetch(`${API_URL}/pending-transactions`, { 
+        const pendingRes = await fetch(`${API_URL}/pending-transactions?t=${Date.now()}`, { 
             signal: controller.signal,
             cache: 'no-store',
             headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
@@ -175,7 +175,7 @@ async function fetchNetworkData() {
         const pending = await pendingRes.json();
         
         // Fetch Validators
-        const valRes = await fetch(`${API_URL}/validators`, { 
+        const valRes = await fetch(`${API_URL}/validators?t=${Date.now()}`, { 
             signal: controller.signal,
             cache: 'no-store',
             headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
@@ -819,9 +819,10 @@ async function initDashboard() {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), 4000);
             
-            const res = await fetch(`${endpoint}/blocks`, { 
+            const res = await fetch(`${endpoint}/blocks?t=${Date.now()}`, { 
                 signal: controller.signal,
-                headers: { 'ngrok-skip-browser-warning': 'true' }
+                cache: 'no-store',
+                headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' }
             });
             clearTimeout(id);
             
