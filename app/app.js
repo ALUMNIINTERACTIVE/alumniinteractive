@@ -20,10 +20,16 @@ const blocksTable = document.querySelector('#blocks-table tbody');
 // Wallet DOM
 const btnGenerate = document.getElementById('btn-generate-wallet');
 const btnImport = document.getElementById('btn-import-wallet');
+const importForm = document.getElementById('import-wallet-form');
+const importPriv = document.getElementById('import-priv-input');
+const importPub = document.getElementById('import-pub-input');
+const btnSubmitImport = document.getElementById('btn-submit-import');
 const pubKeyField = document.getElementById('wallet-pub');
 const privKeyField = document.getElementById('wallet-priv');
+const togglePrivKey = document.getElementById('toggle-priv-key');
 const balanceField = document.getElementById('wallet-balance');
 const btnSendTx = document.getElementById('btn-send-tx');
+const btnStakeTx = document.getElementById('btn-stake-tx');
 
 // DEX DOM
 const btnMintToken = document.getElementById('btn-mint-token');
@@ -32,6 +38,16 @@ const btnSwapTokens = document.getElementById('btn-swap-tokens');
 
 // State
 let currentWallet = null;
+
+// Attempt to load persistent wallet from browser storage
+const savedWallet = localStorage.getItem('alumni_wallet');
+if (savedWallet) {
+    try {
+        currentWallet = JSON.parse(savedWallet);
+    } catch (e) {
+        console.error("Failed to parse saved wallet");
+    }
+}
 
 // --- Navigation ---
 navLinks.forEach(link => {
@@ -64,6 +80,12 @@ async function fetchNetworkData() {
         
         if (currentWallet) {
             updateWalletBalance(blocks);
+            // Ensure keys are visually rendered if loaded from storage
+            if (pubKeyField.textContent === 'Not Generated') {
+                pubKeyField.textContent = formatKeyDisplay(currentWallet.publicKey);
+                privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
+                togglePrivKey.style.display = 'inline';
+            }
         }
 
     } catch (err) {
@@ -99,6 +121,23 @@ function updateDashboard(blocks, pending, validators) {
     });
 }
 
+function formatKeyDisplay(keyPem) {
+    if (!keyPem) return 'Not Generated';
+    return keyPem.replace(/-----BEGIN[^-]*-----/g, '').replace(/-----END[^-]*-----/g, '').replace(/\s+/g, '');
+}
+
+togglePrivKey.addEventListener('click', () => {
+    if (privKeyField.style.filter === 'blur(5px)') {
+        privKeyField.style.filter = 'none';
+        privKeyField.style.userSelect = 'text';
+        togglePrivKey.textContent = '[Hide]';
+    } else {
+        privKeyField.style.filter = 'blur(5px)';
+        privKeyField.style.userSelect = 'none';
+        togglePrivKey.textContent = '[Show]';
+    }
+});
+
 // --- Wallet Logic ---
 btnGenerate.addEventListener('click', async () => {
     try {
@@ -106,8 +145,11 @@ btnGenerate.addEventListener('click', async () => {
         const keys = await res.json();
         
         currentWallet = keys;
-        pubKeyField.textContent = keys.publicKey;
-        privKeyField.textContent = keys.privateKey;
+        localStorage.setItem('alumni_wallet', JSON.stringify(currentWallet));
+        
+        pubKeyField.textContent = formatKeyDisplay(keys.publicKey);
+        privKeyField.textContent = formatKeyDisplay(keys.privateKey);
+        togglePrivKey.style.display = 'inline';
         
         alert('Wallet generated successfully! Keep your private key safe.');
         fetchNetworkData(); // trigger balance update
@@ -117,13 +159,28 @@ btnGenerate.addEventListener('click', async () => {
 });
 
 btnImport.addEventListener('click', () => {
-    const pk = prompt('Enter your Private Key (PEM format):');
-    const pub = prompt('Enter your Public Key (PEM format):');
+    importForm.style.display = importForm.style.display === 'none' ? 'block' : 'none';
+});
+
+btnSubmitImport.addEventListener('click', () => {
+    const pk = importPriv.value.trim();
+    const pub = importPub.value.trim();
+    
     if (pk && pub) {
         currentWallet = { privateKey: pk, publicKey: pub };
-        pubKeyField.textContent = pub;
-        privKeyField.textContent = pk;
+        localStorage.setItem('alumni_wallet', JSON.stringify(currentWallet));
+        
+        pubKeyField.textContent = formatKeyDisplay(pub);
+        privKeyField.textContent = formatKeyDisplay(pk);
+        togglePrivKey.style.display = 'inline';
+        
+        importForm.style.display = 'none';
+        importPriv.value = '';
+        importPub.value = '';
+        
         fetchNetworkData();
+    } else {
+        alert("Please paste both Private and Public keys in PEM format.");
     }
 });
 
@@ -178,14 +235,52 @@ btnSendTx.addEventListener('click', async () => {
     }
 });
 
+btnStakeTx.addEventListener('click', async () => {
+    if (!currentWallet) return alert('Please generate or import a wallet first.');
+    
+    const amount = parseFloat(document.getElementById('tx-stake-amount').value);
+    
+    if (!amount || amount <= 0) return alert('Invalid stake amount');
+
+    try {
+        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                privateKey: currentWallet.privateKey,
+                fromAddress: currentWallet.publicKey,
+                toAddress: currentWallet.publicKey, // staking to self
+                amount: amount,
+                type: 'STAKE'
+            })
+        });
+        
+        const result = await res.json();
+        if (result.error) throw new Error(result.error);
+        
+        alert(`Successfully staked ${amount} ALUMNI to become a Validator! Tx Hash: ` + result.hash);
+        document.getElementById('tx-stake-amount').value = '';
+        
+        fetchNetworkData();
+    } catch (err) {
+        alert('Stake Failed: ' + err.message);
+    }
+});
+
 // --- DEX Logic ---
 btnMintToken.addEventListener('click', async () => {
+    console.log("MINT BUTTON CLICKED!", currentWallet);
     if (!currentWallet) return alert("Please generate or import a wallet first!");
     const symbol = document.getElementById('mint-symbol').value;
     const supply = document.getElementById('mint-supply').value;
-    if (!symbol || !supply) return;
+    console.log("Values:", symbol, supply);
+    if (!symbol || !supply) return console.log("Returned early due to missing symbol or supply");
 
     try {
+        console.log("Fetching...", API_URL);
         const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
             method: 'POST',
             headers: { 
@@ -201,7 +296,9 @@ btnMintToken.addEventListener('click', async () => {
                 payload: { method: 'createToken', args: { symbol, supply: parseInt(supply) } }
             })
         });
+        console.log("Fetch finished! Status:", res.status);
         const data = await res.json();
+        console.log("Parsed JSON data:", data);
         if (data.error) alert(data.error);
         else {
             alert(`Minted ${supply} ${symbol}! Tx Hash: ` + data.hash);
@@ -209,7 +306,8 @@ btnMintToken.addEventListener('click', async () => {
             document.getElementById('mint-supply').value = '';
         }
     } catch (e) {
-        alert("Error minting token");
+        console.error("MINT ERROR:", e);
+        alert("Error minting token: " + e.message);
     }
 });
 
@@ -297,7 +395,7 @@ async function initDashboard() {
             if (res.ok) {
                 API_URL = endpoint;
                 console.log('Connected to Node:', API_URL);
-                document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator"></div>Node Connected<br><span style="font-size:0.7rem;opacity:0.6">${API_URL}</span>`;
+                document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator"></div>Node Connected<br><span style="font-size:0.7rem;opacity:0.6">Alumni Blockchain</span>`;
                 break;
             }
         } catch (e) {
