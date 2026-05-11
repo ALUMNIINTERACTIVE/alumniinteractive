@@ -326,9 +326,10 @@ const qrCanvas = document.getElementById('qr-canvas');
 btnShowQr.addEventListener('click', () => {
     if (!currentWallet) return;
     if (qrContainer.style.display === 'none') {
+        const payload = `${customAlias || ''}|${stripPemHeaders(currentWallet.publicKey)}`;
         new QRious({
             element: qrCanvas,
-            value: stripPemHeaders(currentWallet.publicKey),
+            value: payload,
             size: 200,
             background: 'white',
             foreground: 'black'
@@ -356,7 +357,23 @@ btnScanQr.addEventListener('click', (e) => {
         
     html5QrcodeScanner.render((decodedText, decodedResult) => {
         // Success Callback
-        document.getElementById('tx-to').value = restorePemHeaders(decodedText);
+        const parts = decodedText.split('|');
+        let displayAlias = '';
+        let rawBase64 = '';
+        
+        if (parts.length === 2) {
+            displayAlias = parts[0] ? `@ALUMNI.${parts[0]}` : `@ALUMNI.${parts[1].substring(0, 8)}`;
+            rawBase64 = parts[1];
+        } else {
+            // Legacy / raw scan fallback
+            displayAlias = `@ALUMNI.${decodedText.substring(0, 8)}`;
+            rawBase64 = decodedText;
+        }
+
+        const inputField = document.getElementById('tx-to');
+        inputField.value = displayAlias;
+        inputField.dataset.rawKey = restorePemHeaders(rawBase64);
+        
         closeScanner();
     }, (errorMessage) => {
         // Parse error, ignore
@@ -395,8 +412,14 @@ function updateWalletBalance(blocks) {
 
 btnSendTx.addEventListener('click', async () => {
     if (!currentWallet) return alert('Please generate or import a wallet first.');
+    const inputField = document.getElementById('tx-to');
     
-    const toAddress = document.getElementById('tx-to').value;
+    // Check if the alias scanner set a raw key, otherwise try to reconstruct the user input
+    let toAddress = inputField.dataset.rawKey;
+    if (!toAddress) {
+        toAddress = restorePemHeaders(inputField.value.trim());
+    }
+    
     const amount = parseFloat(document.getElementById('tx-amount').value);
     
     if (!toAddress || !amount || amount <= 0) return alert('Invalid inputs');
