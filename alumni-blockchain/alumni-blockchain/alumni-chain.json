@@ -1,0 +1,191 @@
+[
+  {
+    "timestamp": 1778284800000,
+    "transactions": [],
+    "previousHash": "0",
+    "validator": null,
+    "signature": "",
+    "hash": "eb492f18651647a4ef588dcad43e5cda01200648fa3d772496482856dc533347"
+  },
+  {
+    "timestamp": 1778373693772,
+    "transactions": [
+      {
+        "fromAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "toAddress": "SYSTEM",
+        "amount": 0,
+        "type": "CONTRACT_DEPLOY",
+        "payload": {
+          "code": "// ==============================================================================\n// ALC-20 AND AMM DEX SMART CONTRACT\n// Pattern: Single-Program Architecture (Similar to Solana SPL Token Program)\n// ==============================================================================\n\n/**\n * Creates a new ALC-20 Token and mints the initial supply to the creator\n */\nfunction createToken(args, state, msg) {\n  const symbol = args.symbol;\n  const supply = args.supply;\n\n  if (!state.tokens) state.tokens = {};\n  if (!state.balances) state.balances = {};\n  \n  if (state.tokens[symbol]) {\n    throw new Error(`Token ${symbol} already exists.`);\n  }\n\n  // Register token\n  state.tokens[symbol] = {\n    creator: msg.sender,\n    totalSupply: supply\n  };\n\n  // Mint initial supply to creator\n  if (!state.balances[symbol]) state.balances[symbol] = {};\n  state.balances[symbol][msg.sender] = supply;\n\n  return `Successfully created ${supply} ${symbol} tokens.`;\n}\n\n/**\n * Transfers ALC-20 tokens between addresses\n */\nfunction transfer(args, state, msg) {\n  const symbol = args.symbol;\n  const to = args.to;\n  const amount = args.amount;\n\n  if (!state.tokens[symbol]) throw new Error('Token does not exist.');\n  if (!state.balances[symbol][msg.sender] || state.balances[symbol][msg.sender] < amount) {\n    throw new Error(`Insufficient ${symbol} balance.`);\n  }\n\n  // Deduct from sender\n  state.balances[symbol][msg.sender] -= amount;\n  \n  // Add to recipient\n  if (!state.balances[symbol][to]) state.balances[symbol][to] = 0;\n  state.balances[symbol][to] += amount;\n\n  return `Transferred ${amount} ${symbol} to ${to.substring(0, 16)}...`;\n}\n\n/**\n * AMM: Create a Liquidity Pool for Token A and Token B\n */\nfunction createPool(args, state, msg) {\n  const { symbolA, symbolB, amountA, amountB } = args;\n  \n  if (!state.pools) state.pools = {};\n  const poolId = [symbolA, symbolB].sort().join('-');\n\n  if (state.pools[poolId]) throw new Error('Liquidity pool already exists.');\n\n  // Transfer tokens from creator to the 'POOL' address\n  transfer({ symbol: symbolA, to: poolId, amount: amountA }, state, msg);\n  transfer({ symbol: symbolB, to: poolId, amount: amountB }, state, msg);\n\n  const isAtoB = symbolA < symbolB;\n  const reserveA = isAtoB ? amountA : amountB;\n  const reserveB = isAtoB ? amountB : amountA;\n\n  // Initialize Constant Product AMM (x * y = k)\n  state.pools[poolId] = {\n    reserveA: reserveA,\n    reserveB: reserveB,\n    k: reserveA * reserveB\n  };\n\n  return `Created Liquidity Pool for ${symbolA}/${symbolB}.`;\n}\n\n/**\n * AMM: Swap Token A for Token B using Constant Product Formula\n */\nfunction swap(args, state, msg) {\n  const { symbolIn, symbolOut, amountIn } = args;\n  const poolId = [symbolIn, symbolOut].sort().join('-');\n\n  if (!state.pools || !state.pools[poolId]) throw new Error('Pool does not exist.');\n\n  const pool = state.pools[poolId];\n  \n  // Determine direction\n  const isAtoB = symbolIn < symbolOut;\n  const reserveIn = isAtoB ? pool.reserveA : pool.reserveB;\n  const reserveOut = isAtoB ? pool.reserveB : pool.reserveA;\n\n  // Constant Product Formula: (x + dx) * (y - dy) = k\n  // dy = y - (k / (x + dx))\n  const newReserveIn = reserveIn + amountIn;\n  const newReserveOut = pool.k / newReserveIn;\n  const amountOut = reserveOut - newReserveOut;\n\n  if (amountOut <= 0) throw new Error('Insufficient output amount.');\n\n  // Execute transfers\n  // 1. User sends symbolIn to Pool\n  transfer({ symbol: symbolIn, to: poolId, amount: amountIn }, state, msg);\n  \n  // 2. Pool sends symbolOut to User (We forge the sender as the pool)\n  const poolMsg = { sender: poolId };\n  transfer({ symbol: symbolOut, to: msg.sender, amount: amountOut }, state, poolMsg);\n\n  // Update reserves\n  if (isAtoB) {\n    pool.reserveA = newReserveIn;\n    pool.reserveB = newReserveOut;\n  } else {\n    pool.reserveB = newReserveIn;\n    pool.reserveA = newReserveOut;\n  }\n\n  return `Swapped ${amountIn} ${symbolIn} for ${amountOut.toFixed(4)} ${symbolOut}.`;\n}\n",
+          "initialState": {}
+        },
+        "timestamp": 1778373693771,
+        "signature": "3045022100c8636b16c9691f4f562177aaa8c5d9e34e398e44c6ac55e39f8ae3a33b41931902204670ae2da98981dd44b7d4d2cfe1168917c3c113426bb7adf1ee7cd4b941a4a2"
+      },
+      {
+        "fromAddress": null,
+        "toAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "amount": 50,
+        "type": "TRANSFER",
+        "payload": null,
+        "timestamp": 1778373693772,
+        "signature": ""
+      }
+    ],
+    "previousHash": "eb492f18651647a4ef588dcad43e5cda01200648fa3d772496482856dc533347",
+    "validator": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+    "signature": "30440220502b194e9b332dd7ea49ada7484240cdbe0c63a9f9629e2d74129be2ef7478180220307c2475318bf8a773e493627494e9b1b8cc30751e258c0336f81f5612693b7d",
+    "hash": "a47f8ed52929cce158cdc962138a604512c405298e25959faeaba21a5b699f18"
+  },
+  {
+    "timestamp": 1778373693776,
+    "transactions": [
+      {
+        "fromAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "toAddress": "f404c8f0e316ce023ee1723dc16fac8cef1aa09519f2d7e780adf5f90c6181ab",
+        "amount": 0,
+        "type": "CONTRACT_CALL",
+        "payload": {
+          "method": "createToken",
+          "args": {
+            "symbol": "W-ALUMNI",
+            "supply": 1000000
+          }
+        },
+        "timestamp": 1778373693774,
+        "signature": "304502205f4146ccd7ab83e37cac5bffc516b4a3e0ec33ecbf44c9b836ada05142e7591b022100f24ea137bae0b715da100f7765eb56ac3b3bc9aa80276c9e644f21e07082e7ba"
+      },
+      {
+        "fromAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "toAddress": "f404c8f0e316ce023ee1723dc16fac8cef1aa09519f2d7e780adf5f90c6181ab",
+        "amount": 0,
+        "type": "CONTRACT_CALL",
+        "payload": {
+          "method": "createToken",
+          "args": {
+            "symbol": "DOGE",
+            "supply": 5000000
+          }
+        },
+        "timestamp": 1778373693775,
+        "signature": "30460221009c08b7f2dbff6de4f82fe49744abd8840aac270f5082689403356493383fbc47022100cd672fd183a4ec5a892815e9ae7c5e4380c9f1b0d3c34d1268148f24244b3ea0"
+      },
+      {
+        "fromAddress": null,
+        "toAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "amount": 50,
+        "type": "TRANSFER",
+        "payload": null,
+        "timestamp": 1778373693776,
+        "signature": ""
+      }
+    ],
+    "previousHash": "a47f8ed52929cce158cdc962138a604512c405298e25959faeaba21a5b699f18",
+    "validator": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+    "signature": "30450221008c0f671e8f6fe270329c2f925bcfac8fe5aeefd8aaeac0d69f98a156534a5cd9022068110d19900e41a3f5fcb6b3b800db9138ab1e0447cc1fb7ab1418b10ebd23c4",
+    "hash": "c2914cdb24239c9e68e20ec8c5a0c7fc8bd799168972e8009d8095009d66b2bb"
+  },
+  {
+    "timestamp": 1778373693779,
+    "transactions": [
+      {
+        "fromAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "toAddress": "f404c8f0e316ce023ee1723dc16fac8cef1aa09519f2d7e780adf5f90c6181ab",
+        "amount": 0,
+        "type": "CONTRACT_CALL",
+        "payload": {
+          "method": "createPool",
+          "args": {
+            "symbolA": "W-ALUMNI",
+            "symbolB": "DOGE",
+            "amountA": 10000,
+            "amountB": 500000
+          }
+        },
+        "timestamp": 1778373693778,
+        "signature": "304502201cff9b32ea19da0728ed90dec39d679907fdac1831c3ebd86358c3c84379649b022100c126683d7220e4593ff00d24f017ef741c006c4770f9adf01894c0c781dd9293"
+      },
+      {
+        "fromAddress": null,
+        "toAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "amount": 50,
+        "type": "TRANSFER",
+        "payload": null,
+        "timestamp": 1778373693779,
+        "signature": ""
+      }
+    ],
+    "previousHash": "c2914cdb24239c9e68e20ec8c5a0c7fc8bd799168972e8009d8095009d66b2bb",
+    "validator": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+    "signature": "3046022100b03409e74fd8cfb87dc14a604e91d8ad6eac6dda4bebf1d023d3a73b412561f6022100e65800b481f03dba161f3330fbb0e98f74f72bdc9dec5ad6672fcd44b3417343",
+    "hash": "0c0e09ebeec03c6da4586131cac262889e9909fcc608f6e16d06226fa91e2208"
+  },
+  {
+    "timestamp": 1778373693780,
+    "transactions": [
+      {
+        "fromAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "toAddress": "f404c8f0e316ce023ee1723dc16fac8cef1aa09519f2d7e780adf5f90c6181ab",
+        "amount": 0,
+        "type": "CONTRACT_CALL",
+        "payload": {
+          "method": "transfer",
+          "args": {
+            "symbol": "W-ALUMNI",
+            "to": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE2s0oOS/YftHI73mJyvjPBBz1szKw9Mtx\nBU7j+/GuKjfn5E+CgnPQHlqiMBdRofF7IKJvgOmab4rRxVLsvuEJpA==\n-----END PUBLIC KEY-----\n",
+            "amount": 500
+          }
+        },
+        "timestamp": 1778373693780,
+        "signature": "3045022100fda3e70a764c37bc1d19f52f60e967dd1252576c5ce8ea4384904d3872b9a3660220203926242ba498b8c09023811ccfd90e6a0a8798b9c824c1486862223d11e616"
+      },
+      {
+        "fromAddress": null,
+        "toAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+        "amount": 50,
+        "type": "TRANSFER",
+        "payload": null,
+        "timestamp": 1778373693780,
+        "signature": ""
+      }
+    ],
+    "previousHash": "0c0e09ebeec03c6da4586131cac262889e9909fcc608f6e16d06226fa91e2208",
+    "validator": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEGeLLn6bXhlT5g8cPDFK7sK1O0xs1BvLX\n6fcTXA1W40IOTnf2ZqdGBBWG9dRZc8nBiSThLb5N3AcK4xR4YSjuyg==\n-----END PUBLIC KEY-----\n",
+    "signature": "30450220757799d72edaad9edd5902883de59001d9f73f68ebc47f8dba98e7b5b2614071022100a7513212e168ce917c4646dc2a918f652df6fb429bb7cb59eaedce253f7ff841",
+    "hash": "02ab90d48b501b3594cf438457895e0a36d7fbbd61622e56004a82da99ca27f1"
+  },
+  {
+    "timestamp": 1778373693783,
+    "transactions": [
+      {
+        "fromAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE2s0oOS/YftHI73mJyvjPBBz1szKw9Mtx\nBU7j+/GuKjfn5E+CgnPQHlqiMBdRofF7IKJvgOmab4rRxVLsvuEJpA==\n-----END PUBLIC KEY-----\n",
+        "toAddress": "f404c8f0e316ce023ee1723dc16fac8cef1aa09519f2d7e780adf5f90c6181ab",
+        "amount": 0,
+        "type": "CONTRACT_CALL",
+        "payload": {
+          "method": "swap",
+          "args": {
+            "symbolIn": "W-ALUMNI",
+            "symbolOut": "DOGE",
+            "amountIn": 100
+          }
+        },
+        "timestamp": 1778373693782,
+        "signature": "3046022100afba7554a21ab0c26c3535e1ea6988d902367d98c50efe0c55906b7b68eb5b1f022100bfa2beb33b0e6eaa20c7429b34276822a41fe37e5a0381bf4bfeee5a2a563d11"
+      },
+      {
+        "fromAddress": null,
+        "toAddress": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE2s0oOS/YftHI73mJyvjPBBz1szKw9Mtx\nBU7j+/GuKjfn5E+CgnPQHlqiMBdRofF7IKJvgOmab4rRxVLsvuEJpA==\n-----END PUBLIC KEY-----\n",
+        "amount": 50,
+        "type": "TRANSFER",
+        "payload": null,
+        "timestamp": 1778373693783,
+        "signature": ""
+      }
+    ],
+    "previousHash": "02ab90d48b501b3594cf438457895e0a36d7fbbd61622e56004a82da99ca27f1",
+    "validator": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE2s0oOS/YftHI73mJyvjPBBz1szKw9Mtx\nBU7j+/GuKjfn5E+CgnPQHlqiMBdRofF7IKJvgOmab4rRxVLsvuEJpA==\n-----END PUBLIC KEY-----\n",
+    "signature": "304402207e2b2da0448b100c0baaa0f67cc836fa43edca925d6d58e6c655b4990e2a9e4f02206fa583aab0cf2fbc5b7295dc0852367ec709df07e7dd6a9e100b579eb624e90a",
+    "hash": "3637877b4bbd6bf8a9f697898832029e5042065f7be43e8c66fc95359a9e31f9"
+  }
+]

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALUMNI Network | The Future of Decentralized Finance</title>
+    <meta name="description" content="ALUMNI is a high-speed, natively engineered Layer 1 Blockchain powering the next generation of DeFi.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">▲</span>
+            <span class="logo-text">ALUMNI</span>
+        </div>
+        <div class="nav-links">
+            <a href="#hero">Protocol</a>
+            <a href="#defi">DeFi</a>
+            <a href="#developers">Developers</a>
+        </div>
+        <div class="nav-actions">
+            <!-- Updated to point to main site dashboard if exists, or remove since dashboard isn't pushed to Github Pages yet -->
+            <a href="../app/index.html" class="btn-primary">Launch App</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="hero" class="hero">
+        <div class="glass-orb orb-1"></div>
+        <div class="glass-orb orb-2"></div>
+        
+        <div class="hero-content">
+            <div class="badge">Mainnet is Live</div>
+            <h1 class="hero-title">The Foundation of<br><span class="gradient-text">Absolute Decentralization.</span></h1>
+            <p class="hero-subtitle">A native, mathematically-secured Layer 1 Blockchain engineered for maximum velocity. No dependencies. No bloat. Just pure computational power.</p>
+            
+            <div class="hero-buttons">
+                <a href="../app/index.html" class="btn-primary large">Enter Ecosystem</a>
+                <a href="https://github.com/ALUMNIINTERACTIVE/alumniinteractive" class="btn-secondary large">Read Whitepaper</a>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card glass-panel">
+                    <h3>Sub-Millisecond</h3>
+                    <p>Block Finality</p>
+                </div>
+                <div class="stat-card glass-panel">
+                    <h3>Proof of Stake</h3>
+                    <p>Consensus Engine</p>
+                </div>
+                <div class="stat-card glass-panel">
+                    <h3>Zero</h3>
+                    <p>NPM Dependencies</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- DeFi Section -->
+    <section id="defi" class="section dark-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>The Application Layer</h2>
+                <p>Native Smart Contracts powering the next generation of Finance.</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="feature-card glass-panel">
+                    <div class="icon">🪙</div>
+                    <h3>ALC-20 Token Standard</h3>
+                    <p>Deploy custom cryptocurrencies, Stablecoins, and utility tokens instantly using the global AlumniDeFi registry.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <div class="icon">💱</div>
+                    <h3>AlumniSwap AMM DEX</h3>
+                    <p>A globally shared, deeply liquid Automated Market Maker integrated directly into the Layer 1 protocol.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Developer Section -->
+    <section id="developers" class="section">
+        <div class="container">
+            <div class="grid-2 align-center">
+                <div class="dev-content">
+                    <h2>Run a Node in <span class="gradient-text">30 Seconds</span>.</h2>
+                    <p>The ALUMNI protocol is engineered in pristine native JavaScript. Forget massive toolchains and gigabytes of dependencies.</p>
+                    <ul class="dev-list">
+                        <li>Clone the repository</li>
+                        <li>Run `node start-node.mjs`</li>
+                        <li>You are now verifying the network.</li>
+                    </ul>
+                    <a href="https://github.com/ALUMNIINTERACTIVE/alumniinteractive" class="btn-primary">View GitHub Repository</a>
+                </div>
+                <div class="dev-terminal glass-panel">
+                    <div class="terminal-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="term-title">bash - alumni-node</span>
+                    </div>
+                    <div class="terminal-body">
+                        <code>$ git clone https://github.com/ALUMNIINTERACTIVE/alumniinteractive.git</code><br>
+                        <code>$ cd alumni-blockchain</code><br>
+                        <code>$ node start-node.mjs</code><br>
+                        <code class="terminal-success">🚀 Bootstrapping ALUMNI PoS Node...</code><br>
+                        <code class="terminal-success">✅ Node successfully started!</code><br>
+                        <code class="terminal-info">📡 API URL: http://localhost:3001</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="logo">
+                <span class="logo-icon">▲</span>
+                <span class="logo-text">ALUMNI</span>
+            </div>
+            <p>Built by Alumni Interactive.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

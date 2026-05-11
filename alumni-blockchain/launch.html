@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launch System Builder | Custom App Development | Alumni Interactive</title>
+    <meta name="description" content="Build your Core Launch System with Alumni Interactive. Rapid web presence, booking systems, and custom branded mobile apps starting at $5,000.">
+    <meta name="keywords" content="Custom App Development, Web Hosting, Booking System, Alumni Interactive Launch System, MVP Software">
+    
+    <link rel="canonical" href="https://alumniinteractive.com/launch.html">
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Launch System Builder | Alumni Interactive">
+    <meta property="og:description" content="Rapid digital infrastructure and custom branded applications starting at $5,000.">
+    <meta property="og:image" content="https://alumniinteractive.com/logo.png">
+    <meta property="og:url" content="https://alumniinteractive.com/launch.html">
+    <meta property="og:type" content="website">
+
+    <!-- JSON-LD Product Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "Core Launch System",
+      "image": "https://alumniinteractive.com/logo.png",
+      "description": "Rapid digital infrastructure including web presence, booking/order systems, and basic analytics.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Alumni Interactive"
+      },
+      "offers": {
+        "@type": "AggregateOffer",
+        "url": "https://alumniinteractive.com/launch.html",
+        "priceCurrency": "USD",
+        "lowPrice": "5000",
+        "highPrice": "15000",
+        "offerCount": "3"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .page-wrapper { padding-top: 120px; min-height: 100vh; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo" style="text-decoration:none;"><span class="text-metallic">ALUMNI</span> INTΞRACTIVΞ</a>
+            <nav class="nav-links">
+                <a href="index.html#services">Services</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="index.html#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-wrapper container">
+        <div class="pipeline-header animate-on-scroll">
+            <h1 class="text-metallic">Build Your Launch System</h1>
+            <p>Select your foundational tier and customize your digital infrastructure.</p>
+        </div>
+
+        <div class="pipeline-grid">
+            <!-- Left Side: Options -->
+            <div class="options-panel">
+                <h3>1. Select Base Tier</h3>
+                <div class="option-item base-tier selected" data-price="5000" data-name="Core Launch ($5k)">
+                    <div class="option-info">
+                        <h4>Core Launch</h4>
+                        <p>Web presence, booking/order system, basic analytics.</p>
+                    </div>
+                    <div class="option-price">$5,000</div>
+                </div>
+                <div class="option-item base-tier" data-price="12000" data-name="Advanced Launch ($12k)">
+                    <div class="option-info">
+                        <h4>Advanced Launch</h4>
+                        <p>Includes Core + Branded Mobile App & Push Notifications.</p>
+                    </div>
+                    <div class="option-price">$12,000</div>
+                </div>
+                <div class="option-item base-tier" data-price="15000" data-name="Ultimate Launch ($15k)">
+                    <div class="option-info">
+                        <h4>Ultimate Launch</h4>
+                        <p>Includes Advanced + Custom Admin Dashboard & Priority Delivery.</p>
+                    </div>
+                    <div class="option-price">$15,000</div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">2. Select Add-ons</h3>
+                <div class="option-item addon" data-price="1500" data-name="Advanced SEO Setup">
+                    <div class="option-info">
+                        <h4>Advanced SEO Setup</h4>
+                        <p>Comprehensive keyword strategy and on-page optimization.</p>
+                    </div>
+                    <div class="option-price">+$1,500</div>
+                </div>
+                <div class="option-item addon" data-price="2500" data-name="Automated Email Workflows">
+                    <div class="option-info">
+                        <h4>Automated Email Workflows</h4>
+                        <p>Drip campaigns and cart abandonment sequences.</p>
+                    </div>
+                    <div class="option-price">+$2,500</div>
+                </div>
+                <div class="option-item addon" data-price="3000" data-name="Custom Brand Identity">
+                    <div class="option-info">
+                        <h4>Custom Brand Identity</h4>
+                        <p>Full logo package, style guide, and brand assets.</p>
+                    </div>
+                    <div class="option-price">+$3,000</div>
+                </div>
+            </div>
+
+            <!-- Right Side: Summary & Form -->
+            <div class="summary-panel">
+                <h3>Estimated Investment</h3>
+                <div class="summary-total" id="priceDisplay">$5,000 <span>USD</span></div>
+                
+                <h3 style="margin-top: 2rem;">Submit Your Build</h3>
+                <p style="color: var(--text-dim); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Submit your selected infrastructure to our team. We'll follow up within 24 hours.
+                </p>
+                <!-- Formspree Endpoint -->
+                <form id="pipelineForm" class="lead-form" action="https://formspree.io/f/xrejygre" method="POST">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <input type="tel" name="phone" placeholder="Phone Number">
+                    <textarea name="project_details" placeholder="Tell us more about your business goals..." rows="4"></textarea>
+                    
+                    <!-- Hidden fields to capture calculator data -->
+                    <input type="text" name="_gotcha" style="display:none" />
+                    <input type="hidden" name="Selected_Tier" id="inputTier" value="Core Launch ($5k)">
+                    <input type="hidden" name="Selected_Addons" id="inputAddons" value="None">
+                    <input type="hidden" name="Total_Estimated_Price" id="inputTotal" value="$5,000">
+                    <input type="hidden" name="_subject" value="New Launch System Inquiry!">
+
+                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Initialize System Build</button>
+                </form>
+                <div id="formStatus" style="display: none; padding: 1.5rem; background: rgba(0,255,255,0.05); border: 1px solid var(--neon-cyan); border-radius: 4px; margin-top: 1rem; color: #fff; text-align: center;">
+                    <h4 style="color: var(--neon-cyan); margin-bottom: 0.5rem; font-size: 1.2rem;">System Initialized</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-light);">Your build parameters have been successfully transmitted. Our architects will contact you within 24 hours.</p>
+                </div>
+                <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.8rem; text-align: center;">
+                    *Prices are estimates and subject to final scope review.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="logo" style="font-size: 1.2rem;"><span class="text-metallic">ALUMNI</span> INTΞRACTIVΞ</div>
+            <p style="color: var(--text-dim); margin-top: 10px; font-size: 0.9rem;">&copy; 2026 Alumni Interactive. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const baseTiers = document.querySelectorAll('.base-tier');
+        const addons = document.querySelectorAll('.addon');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const inputTier = document.getElementById('inputTier');
+        const inputAddons = document.getElementById('inputAddons');
+        const inputTotal = document.getElementById('inputTotal');
+
+        let currentBasePrice = 5000;
+        let currentTierName = "Core Launch ($5k)";
+
+        function updateTotals() {
+            let total = currentBasePrice;
+            let selectedAddons = [];
+
+            addons.forEach(addon => {
+                if (addon.classList.contains('selected')) {
+                    total += parseInt(addon.getAttribute('data-price'));
+                    selectedAddons.push(addon.getAttribute('data-name'));
+                }
+            });
+
+            const formattedTotal = "$" + total.toLocaleString();
+            priceDisplay.innerHTML = formattedTotal + " <span>USD</span>";
+
+            inputTotal.value = formattedTotal;
+            inputAddons.value = selectedAddons.length > 0 ? selectedAddons.join(", ") : "None";
+        }
+
+        baseTiers.forEach(tier => {
+            tier.addEventListener('click', () => {
+                baseTiers.forEach(t => t.classList.remove('selected'));
+                tier.classList.add('selected');
+                currentBasePrice = parseInt(tier.getAttribute('data-price'));
+                currentTierName = tier.getAttribute('data-name');
+                inputTier.value = currentTierName;
+                updateTotals();
+            });
+        });
+
+        addons.forEach(addon => {
+            addon.addEventListener('click', () => {
+                addon.classList.toggle('selected');
+                updateTotals();
+            });
+        });
+
+        // AJAX Formspree Submission
+        const form = document.getElementById('pipelineForm');
+        const formStatus = document.getElementById('formStatus');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Transmitting...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: data,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    form.style.display = 'none';
+                    formStatus.style.display = 'block';
+                } else {
+                    submitBtn.textContent = 'Error. Please Try Again.';
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                submitBtn.textContent = 'Network Error. Please Try Again.';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
