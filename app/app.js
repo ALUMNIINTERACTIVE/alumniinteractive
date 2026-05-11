@@ -404,7 +404,15 @@ btnSubmitImport.addEventListener('click', () => {
     const pub = importPub.value.trim().replace(/\\n/g, '\n');
     
     if (pk && pub) {
-        const newWallet = { alias: `Imported Wallet ${alumniWallets.length + 1}`, privateKey: pk, publicKey: pub };
+        const strippedPub = pub.replace(/\s+/g, '');
+        const satoshiKey = "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAENwPfFbba+A9l6uFutbQucAOUgPQNujNn\nTl+oXgr5F0U+SPynvHJbC07kXms5iYwEAtqT1D3ErWnPX+a6XE7NtQ==\n-----END PUBLIC KEY-----\n".replace(/\s+/g, '');
+        
+        let alias = `Imported Wallet ${alumniWallets.length + 1}`;
+        if (strippedPub === satoshiKey) {
+            alias = "SATOSHI";
+        }
+        
+        const newWallet = { alias: alias, privateKey: pk, publicKey: pub };
         alumniWallets.push(newWallet);
         localStorage.setItem('alumni_wallets', JSON.stringify(alumniWallets));
         
