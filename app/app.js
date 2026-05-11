@@ -50,6 +50,17 @@ if (savedWallet) {
 }
 
 // --- Navigation ---
+// Restore active view on load
+const savedView = localStorage.getItem('alumni_active_view');
+if (savedView) {
+    navLinks.forEach(l => l.classList.remove('active'));
+    views.forEach(v => v.classList.remove('active'));
+    const link = Array.from(navLinks).find(l => l.getAttribute('data-view') === savedView);
+    if (link) link.classList.add('active');
+    const view = document.getElementById(`view-${savedView}`);
+    if (view) view.classList.add('active');
+}
+
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
         navLinks.forEach(l => l.classList.remove('active'));
@@ -58,6 +69,9 @@ navLinks.forEach(link => {
         const targetView = link.getAttribute('data-view');
         views.forEach(v => v.classList.remove('active'));
         document.getElementById(`view-${targetView}`).classList.add('active');
+        
+        // Save state
+        localStorage.setItem('alumni_active_view', targetView);
     });
 });
 
@@ -86,6 +100,8 @@ async function fetchNetworkData() {
                 pubKeyField.textContent = formatKeyDisplay(currentWallet.publicKey);
                 privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
                 togglePrivKey.style.display = 'inline';
+                const btnShowQr = document.getElementById('btn-show-qr');
+                if (btnShowQr) btnShowQr.style.display = 'inline';
             }
         }
 
@@ -192,6 +208,8 @@ btnGenerate.addEventListener('click', async () => {
         pubKeyField.textContent = formatKeyDisplay(keys.publicKey);
         privKeyField.textContent = formatKeyDisplay(keys.privateKey);
         togglePrivKey.style.display = 'inline';
+        const btnShowQr = document.getElementById('btn-show-qr');
+        if (btnShowQr) btnShowQr.style.display = 'inline';
         
         alert('Wallet generated successfully! Keep your private key safe.');
         fetchNetworkData(); // trigger balance update
@@ -215,6 +233,8 @@ btnSubmitImport.addEventListener('click', () => {
         pubKeyField.textContent = formatKeyDisplay(pub);
         privKeyField.textContent = formatKeyDisplay(pk);
         togglePrivKey.style.display = 'inline';
+        const btnShowQr = document.getElementById('btn-show-qr');
+        if (btnShowQr) btnShowQr.style.display = 'inline';
         
         importForm.style.display = 'none';
         importPriv.value = '';
@@ -225,6 +245,67 @@ btnSubmitImport.addEventListener('click', () => {
         alert("Please paste both Private and Public keys in PEM format.");
     }
 });
+
+// --- QR Code Logic ---
+const btnShowQr = document.getElementById('btn-show-qr');
+const qrContainer = document.getElementById('qr-display-container');
+const qrCanvas = document.getElementById('qr-canvas');
+
+btnShowQr.addEventListener('click', () => {
+    if (!currentWallet) return;
+    if (qrContainer.style.display === 'none') {
+        new QRious({
+            element: qrCanvas,
+            value: currentWallet.publicKey,
+            size: 200,
+            background: 'white',
+            foreground: 'black'
+        });
+        qrContainer.style.display = 'flex';
+        btnShowQr.textContent = '[Hide QR]';
+    } else {
+        qrContainer.style.display = 'none';
+        btnShowQr.textContent = '[Show QR]';
+    }
+});
+
+let html5QrcodeScanner = null;
+const btnScanQr = document.getElementById('btn-scan-qr');
+const qrModal = document.getElementById('qr-scanner-modal');
+const btnCloseScanner = document.getElementById('btn-close-scanner');
+
+btnScanQr.addEventListener('click', (e) => {
+    e.preventDefault();
+    qrModal.style.display = 'flex';
+    
+    // Initialize Scanner
+    html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", { fps: 10, qrbox: 250 });
+        
+    html5QrcodeScanner.render((decodedText, decodedResult) => {
+        // Success Callback
+        document.getElementById('tx-to').value = decodedText;
+        closeScanner();
+    }, (errorMessage) => {
+        // Parse error, ignore
+    });
+});
+
+function closeScanner() {
+    qrModal.style.display = 'none';
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear().catch(error => {
+            console.error("Failed to clear html5QrcodeScanner. ", error);
+        });
+        html5QrcodeScanner = null;
+    }
+}
+
+btnCloseScanner.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeScanner();
+});
+
 
 function updateWalletBalance(blocks) {
     if (!currentWallet) return;

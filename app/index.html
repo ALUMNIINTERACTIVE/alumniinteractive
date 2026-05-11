@@ -11,6 +11,9 @@
     <!-- Cryptography Library for secp256k1 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- QR Code Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css?v=2">
 </head>
@@ -103,7 +106,13 @@
                     <div class="card glass-panel">
                         <h3>Wallet Identity</h3>
                         <div class="key-display">
-                            <label>Public Key (Address)</label>
+                            <label style="display: flex; justify-content: space-between;">
+                                Public Key (Address)
+                                <span id="btn-show-qr" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Show QR]</span>
+                            </label>
+                            <div id="qr-display-container" style="display: none; justify-content: center; margin-top: 8px; margin-bottom: 12px; background: white; padding: 10px; border-radius: 8px; width: fit-content; margin-left: auto; margin-right: auto;">
+                                <canvas id="qr-canvas"></canvas>
+                            </div>
                             <div class="copyable-field" id="wallet-pub">Not Generated</div>
                             <label style="display: flex; justify-content: space-between;">
                                 Private Key 
@@ -141,8 +150,11 @@
                         
                         <div class="transaction-form">
                             <h4>Send Transaction</h4>
-                            <input type="text" id="tx-to" placeholder="Recipient Public Key" class="input-field">
-                            <input type="number" id="tx-amount" placeholder="Amount" class="input-field">
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="tx-to" placeholder="Recipient Public Key" class="input-field" style="flex: 1; margin-bottom: 0;">
+                                <button id="btn-scan-qr" class="btn secondary" style="padding: 0 16px; margin-bottom: 0;" title="Scan QR Code">📷</button>
+                            </div>
+                            <input type="number" id="tx-amount" placeholder="Amount" class="input-field" style="margin-top: 12px;">
                             <button id="btn-send-tx" class="btn primary full-width">Sign & Send</button>
                         </div>
 
@@ -214,6 +226,15 @@
             </section>
 
         </main>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qr-scanner-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+        <div class="card glass-panel" style="width: 100%; max-width: 400px; padding: 20px; position: relative;">
+            <h3 style="margin-top: 0; text-align: center;">Scan Wallet Address</h3>
+            <div id="qr-reader" style="width: 100%; margin-bottom: 20px; border-radius: 8px; overflow: hidden; background: #000;"></div>
+            <button id="btn-close-scanner" class="btn secondary full-width">Cancel Scan</button>
+        </div>
     </div>
 
     <script src="app.js?v=2"></script>
