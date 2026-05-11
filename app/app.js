@@ -385,6 +385,7 @@ btnDisconnectWallet.addEventListener('click', () => {
     balanceField.textContent = '0.00';
     customTokensContainer.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>';
 });
+}
 
 // --- Wallet Logic ---
 btnGenerate.addEventListener('click', async () => {
