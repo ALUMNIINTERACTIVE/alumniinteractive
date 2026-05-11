@@ -91,6 +91,11 @@ function renderWalletSelector() {
         opt.selected = true;
         walletSelector.appendChild(opt);
     }
+    
+    const btnDisconnectWallet = document.getElementById('btn-disconnect-wallet');
+    if (btnDisconnectWallet) {
+        btnDisconnectWallet.style.display = alumniWallets.length > 0 ? 'inline-block' : 'none';
+    }
 }
 
 if (walletSelector) {
@@ -339,6 +344,28 @@ togglePrivKey.addEventListener('click', () => {
         privKeyField.style.userSelect = 'none';
         togglePrivKey.textContent = '[Show]';
     }
+});
+
+const btnDisconnectWallet = document.getElementById('btn-disconnect-wallet');
+btnDisconnectWallet.addEventListener('click', () => {
+    alumniWallets = [];
+    currentWallet = null;
+    localStorage.removeItem('alumni_wallets');
+    localStorage.removeItem('alumni_active_wallet_idx');
+    renderWalletSelector();
+    
+    pubKeyField.textContent = 'Not Generated';
+    pubKeyField.dataset.rawKey = '';
+    privKeyField.textContent = 'Not Generated';
+    privKeyField.style.filter = 'blur(5px)';
+    togglePrivKey.style.display = 'none';
+    togglePrivKey.textContent = '[Show]';
+    document.getElementById('btn-show-qr').style.display = 'none';
+    document.getElementById('btn-share-pub').style.display = 'none';
+    document.getElementById('btn-edit-tag').style.display = 'none';
+    document.getElementById('qr-display-container').style.display = 'none';
+    balanceField.textContent = '0.00';
+    customTokensContainer.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>';
 });
 
 // --- Wallet Logic ---
