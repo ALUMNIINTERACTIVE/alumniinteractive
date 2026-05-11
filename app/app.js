@@ -192,11 +192,11 @@ async function updateCustomTokens() {
         for (const symbol in state.balances) {
             const tokenBalances = state.balances[symbol];
             
-            // Find the balance by matching trimmed keys
+            // Find the balance by matching keys (strip all whitespace)
             let myBalance = 0;
-            const cleanPub = currentWallet.publicKey.trim();
+            const cleanPub = currentWallet.publicKey.replace(/\s+/g, '');
             for (const holderKey in tokenBalances) {
-                if (holderKey.trim() === cleanPub) {
+                if (holderKey.replace(/\s+/g, '') === cleanPub) {
                     myBalance = tokenBalances[holderKey];
                     break;
                 }
@@ -487,9 +487,9 @@ function updateWalletBalance(blocks) {
     
     blocks.forEach(block => {
         block.transactions.forEach(tx => {
-            const cleanFrom = tx.fromAddress ? tx.fromAddress.trim() : null;
-            const cleanTo = tx.toAddress ? tx.toAddress.trim() : null;
-            const cleanPub = currentWallet.publicKey.trim();
+            const cleanFrom = tx.fromAddress ? tx.fromAddress.replace(/\s+/g, '') : null;
+            const cleanTo = tx.toAddress ? tx.toAddress.replace(/\s+/g, '') : null;
+            const cleanPub = currentWallet.publicKey.replace(/\s+/g, '');
             
             if (cleanFrom === cleanPub) balance -= tx.amount;
             if (cleanTo === cleanPub) balance += tx.amount;
