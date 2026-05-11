@@ -114,12 +114,15 @@ if (walletSelector) {
     });
     renderWalletSelector();
     if (currentWallet) {
-        pubKeyField.textContent = formatAlias(currentWallet.publicKey);
-        privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
-        togglePrivKey.style.display = 'inline';
-        document.getElementById('btn-show-qr').style.display = 'inline';
-        document.getElementById('btn-share-pub').style.display = 'inline';
-        document.getElementById('btn-edit-tag').style.display = 'inline';
+        if (pubKeyField) pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+        if (privKeyField) privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
+        if (togglePrivKey) togglePrivKey.style.display = 'inline';
+        const btnShowQr = document.getElementById('btn-show-qr');
+        if (btnShowQr) btnShowQr.style.display = 'inline';
+        const btnSharePub = document.getElementById('btn-share-pub');
+        if (btnSharePub) btnSharePub.style.display = 'inline';
+        const btnEditTag = document.getElementById('btn-edit-tag');
+        if (btnEditTag) btnEditTag.style.display = 'inline';
     }
 }
 
