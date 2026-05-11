@@ -38,15 +38,75 @@ const btnSwapTokens = document.getElementById('btn-swap-tokens');
 
 // State
 let currentWallet = null;
+let alumniWallets = [];
 
-// Attempt to load persistent wallet from browser storage
-const savedWallet = localStorage.getItem('alumni_wallet');
-if (savedWallet) {
+// Attempt to load persistent wallets from browser storage
+const savedWallets = localStorage.getItem('alumni_wallets');
+if (savedWallets) {
     try {
-        currentWallet = JSON.parse(savedWallet);
+        alumniWallets = JSON.parse(savedWallets);
     } catch (e) {
-        console.error("Failed to parse saved wallet");
+        console.error("Failed to parse saved wallets array");
     }
+}
+
+// Migration from old single wallet structure
+const legacyWallet = localStorage.getItem('alumni_wallet');
+if (legacyWallet && alumniWallets.length === 0) {
+    try {
+        const parsedLegacy = JSON.parse(legacyWallet);
+        parsedLegacy.alias = localStorage.getItem('alumni_wallet_alias') || "Main Wallet";
+        alumniWallets.push(parsedLegacy);
+        localStorage.setItem('alumni_wallets', JSON.stringify(alumniWallets));
+        localStorage.removeItem('alumni_wallet');
+        localStorage.removeItem('alumni_wallet_alias');
+    } catch(e) {}
+}
+
+// Set active wallet
+const activeWalletIndex = localStorage.getItem('alumni_active_wallet_idx') || 0;
+if (alumniWallets.length > 0) {
+    currentWallet = alumniWallets[activeWalletIndex] || alumniWallets[0];
+}
+
+// DOM Selector rendering
+const walletSelector = document.getElementById('wallet-selector');
+function renderWalletSelector() {
+    if (!walletSelector) return;
+    walletSelector.innerHTML = '<option value="" disabled>Select Wallet...</option>';
+    
+    alumniWallets.forEach((w, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = w.alias || `Wallet ${idx + 1}`;
+        if (currentWallet && currentWallet.publicKey === w.publicKey) {
+            opt.selected = true;
+        }
+        walletSelector.appendChild(opt);
+    });
+
+    if (alumniWallets.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = "none";
+        opt.textContent = "No Wallets Found";
+        opt.selected = true;
+        walletSelector.appendChild(opt);
+    }
+}
+
+if (walletSelector) {
+    walletSelector.addEventListener('change', (e) => {
+        const idx = e.target.value;
+        if (idx !== "none") {
+            currentWallet = alumniWallets[idx];
+            localStorage.setItem('alumni_active_wallet_idx', idx);
+            // Refresh UI
+            pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+            privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
+            fetchNetworkData();
+        }
+    });
+    renderWalletSelector();
 }
 
 // --- Navigation ---
@@ -195,11 +255,11 @@ function restorePemHeaders(b64) {
     return `-----BEGIN PUBLIC KEY-----\n${formatted}\n-----END PUBLIC KEY-----\n`;
 }
 
-let customAlias = localStorage.getItem('alumni_wallet_alias');
-
 function formatAlias(keyPem) {
     if (!keyPem) return 'Not Generated';
-    if (customAlias) return `@ALUMNI.${customAlias}`;
+    if (currentWallet && currentWallet.alias && !currentWallet.alias.startsWith('Wallet ') && !currentWallet.alias.startsWith('Imported Wallet ')) {
+        return `@ALUMNI.${currentWallet.alias}`;
+    }
     const b64 = stripPemHeaders(keyPem);
     return `@ALUMNI.${b64.substring(0, 8)}`;
 }
@@ -220,19 +280,24 @@ pubKeyField.addEventListener('click', async () => {
 
 const btnEditTag = document.getElementById('btn-edit-tag');
 btnEditTag.addEventListener('click', () => {
-    const newTag = prompt("Enter your custom ALUMNI Tag (e.g. SATOSHI):", customAlias || "");
+    if (!currentWallet) return;
+    const currentTag = (currentWallet.alias && !currentWallet.alias.startsWith('Wallet ') && !currentWallet.alias.startsWith('Imported Wallet ')) ? currentWallet.alias : "";
+    const newTag = prompt("Enter your custom ALUMNI Tag (e.g. SATOSHI):", currentTag);
     if (newTag !== null) {
-        const cleanTag = newTag.trim().replace(/[^a-zA-Z0-9_-]/g, '').toUpperCase();
+        const cleanTag = newTag.trim().replace(/[^a-zA-Z0-9_-\s]/g, '').toUpperCase();
         if (cleanTag) {
-            customAlias = cleanTag;
-            localStorage.setItem('alumni_wallet_alias', customAlias);
+            currentWallet.alias = cleanTag;
         } else {
-            customAlias = null;
-            localStorage.removeItem('alumni_wallet_alias');
+            currentWallet.alias = `Wallet ${alumniWallets.findIndex(w => w.publicKey === currentWallet.publicKey) + 1}`;
         }
-        if (currentWallet) {
-            pubKeyField.textContent = formatAlias(currentWallet.publicKey);
-        }
+        
+        // Update in array
+        const idx = alumniWallets.findIndex(w => w.publicKey === currentWallet.publicKey);
+        if (idx > -1) alumniWallets[idx] = currentWallet;
+        localStorage.setItem('alumni_wallets', JSON.stringify(alumniWallets));
+        renderWalletSelector();
+        
+        pubKeyField.textContent = formatAlias(currentWallet.publicKey);
     }
 });
 
@@ -272,13 +337,17 @@ togglePrivKey.addEventListener('click', () => {
 btnGenerate.addEventListener('click', async () => {
     try {
         const res = await fetch(`${API_URL}/wallet/generate`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
-        const keys = await res.json();
+        const data = await res.json();
+        const newWallet = { alias: `Wallet ${alumniWallets.length + 1}`, publicKey: data.publicKey, privateKey: data.privateKey };
+        alumniWallets.push(newWallet);
+        localStorage.setItem('alumni_wallets', JSON.stringify(alumniWallets));
         
-        currentWallet = keys;
-        localStorage.setItem('alumni_wallet', JSON.stringify(currentWallet));
+        currentWallet = newWallet;
+        localStorage.setItem('alumni_active_wallet_idx', alumniWallets.length - 1);
+        renderWalletSelector();
         
-        pubKeyField.textContent = formatAlias(keys.publicKey);
-        privKeyField.textContent = formatKeyDisplay(keys.privateKey);
+        pubKeyField.textContent = formatAlias(data.publicKey);
+        privKeyField.textContent = formatKeyDisplay(data.privateKey);
         togglePrivKey.style.display = 'inline';
         document.getElementById('btn-show-qr').style.display = 'inline';
         document.getElementById('btn-edit-tag').style.display = 'inline';
@@ -300,8 +369,13 @@ btnSubmitImport.addEventListener('click', () => {
     const pub = importPub.value.trim().replace(/\\n/g, '\n');
     
     if (pk && pub) {
-        currentWallet = { privateKey: pk, publicKey: pub };
-        localStorage.setItem('alumni_wallet', JSON.stringify(currentWallet));
+        const newWallet = { alias: `Imported Wallet ${alumniWallets.length + 1}`, privateKey: pk, publicKey: pub };
+        alumniWallets.push(newWallet);
+        localStorage.setItem('alumni_wallets', JSON.stringify(alumniWallets));
+        
+        currentWallet = newWallet;
+        localStorage.setItem('alumni_active_wallet_idx', alumniWallets.length - 1);
+        renderWalletSelector();
         
         pubKeyField.textContent = formatAlias(pub);
         privKeyField.textContent = formatKeyDisplay(pk);
@@ -328,7 +402,8 @@ const qrCanvas = document.getElementById('qr-canvas');
 btnShowQr.addEventListener('click', () => {
     if (!currentWallet) return;
     if (qrContainer.style.display === 'none') {
-        const payload = `${customAlias || ''}|${stripPemHeaders(currentWallet.publicKey)}`;
+        const tag = (currentWallet.alias && !currentWallet.alias.startsWith('Wallet ') && !currentWallet.alias.startsWith('Imported Wallet ')) ? currentWallet.alias : '';
+        const payload = `${tag}|${stripPemHeaders(currentWallet.publicKey)}`;
         new QRious({
             element: qrCanvas,
             value: payload,
@@ -443,15 +518,51 @@ btnSendTx.addEventListener('click', async () => {
         });
         
         const result = await res.json();
-        if (result.error) throw new Error(result.error);
-        
-        alert('Transaction successfully signed and broadcasted to mempool!');
-        document.getElementById('tx-to').value = '';
-        document.getElementById('tx-amount').value = '';
-        
-        fetchNetworkData();
+        if (result.error) alert(result.error);
+        else {
+            alert('Transfer Sent! Tx Hash: ' + result.hash);
+            document.getElementById('tx-amount').value = '';
+            fetchNetworkData();
+        }
     } catch (err) {
-        alert('Transaction Failed: ' + err.message);
+        console.error(err);
+        alert('Network error');
+    }
+});
+
+btnStakeTx.addEventListener('click', async () => {
+    if (!currentWallet) return alert('Please generate or import a wallet first.');
+    const amount = parseFloat(document.getElementById('tx-stake-amount').value);
+    
+    if (!amount || amount < 50) return alert('Minimum stake is 50 ALUMNI.');
+
+    try {
+        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                privateKey: currentWallet.privateKey,
+                fromAddress: currentWallet.publicKey,
+                toAddress: currentWallet.publicKey, // You stake to yourself for native validating
+                amount: amount,
+                type: 'STAKE'
+            })
+        });
+        
+        const result = await res.json();
+        if (result.error) alert(result.error);
+        else {
+            alert('Stake Transaction Sent! You are now an active Delegator/Validator. Tx Hash: ' + result.hash);
+            document.getElementById('tx-stake-amount').value = '';
+            fetchNetworkData();
+        }
+    } catch (err) {
+    } catch (err) {
+        console.error(err);
+        alert('Network error');
     }
 });
 

@@ -1,7 +1,25 @@
+#!/usr/bin/env node
 import { Blockchain } from './src/Blockchain.mjs';
 import { P2PNode } from './src/P2PNode.mjs';
 import { HttpApi } from './src/HttpApi.mjs';
 import { Wallet } from './src/Wallet.mjs';
+import fs from 'fs';
+
+// Check for CLI Flags
+if (process.argv.includes('--generate-wallet')) {
+    const w = new Wallet();
+    console.log('\n========================================');
+    console.log('✅ NEW ALUMNI WALLET GENERATED');
+    console.log('========================================');
+    console.log('\n--- PUBLIC KEY (Address) ---');
+    console.log(w.publicKey);
+    console.log('\n--- PRIVATE KEY ---');
+    console.log(w.privateKey);
+    console.log('\n========================================');
+    console.log('Save these keys securely. To use this wallet as a Validator, copy the JSON block below and save it as alumni_node_wallet.json:');
+    console.log('\n' + JSON.stringify({ publicKey: w.publicKey, privateKey: w.privateKey }, null, 2) + '\n');
+    process.exit(0);
+}
 
 // Parse CLI arguments
 const httpPort = process.env.HTTP_PORT || process.argv[2] || 3001;
@@ -17,7 +35,6 @@ if (process.env.PEERS === 'none') {
 // Initialize network components
 
 // Generate or load a wallet for this specific node to act as a Validator
-import fs from 'fs';
 let nodeWallet;
 const walletFile = 'alumni_node_wallet.json';
 

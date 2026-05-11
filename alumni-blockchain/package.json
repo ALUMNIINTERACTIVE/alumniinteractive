@@ -7,8 +7,11 @@
     "start": "node start-node.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["blockchain", "alumni", "node", "validator"],
+  "author": "Alumni Interactive",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "module",
+  "bin": {
+    "alumni-node": "./start-node.mjs"
+  }
 }

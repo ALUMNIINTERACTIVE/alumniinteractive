@@ -108,7 +108,12 @@
                 <div class="dashboard-grid wallet-grid">
                     <!-- Key Management -->
                     <div class="card glass-panel">
-                        <h3>Wallet Identity</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="margin: 0;">Wallet Identity</h3>
+                            <select id="wallet-selector" class="input-field" style="margin: 0; padding: 4px 8px; width: auto; background: rgba(0,0,0,0.5); border: 1px solid var(--alumni-cyan); color: white; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                                <option value="" disabled selected>Select Wallet...</option>
+                            </select>
+                        </div>
                         <div class="key-display">
                             <label style="display: flex; justify-content: space-between;">
                                 Public Key (Address)
