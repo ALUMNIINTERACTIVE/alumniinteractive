@@ -6,6 +6,9 @@ const API_ENDPOINTS = [
 ];
 let API_URL = '';
 
+// The hardcoded address of the live AlumniDeFi Smart Contract
+const DEFI_ADDRESS = 'f404c8f0e316ce023ee1723dc16fac8cef1aa09519f2d7e780adf5f90c6181ab';
+
 // DOM Elements
 const views = document.querySelectorAll('.view');
 const navLinks = document.querySelectorAll('.nav-links li');
@@ -21,6 +24,11 @@ const pubKeyField = document.getElementById('wallet-pub');
 const privKeyField = document.getElementById('wallet-priv');
 const balanceField = document.getElementById('wallet-balance');
 const btnSendTx = document.getElementById('btn-send-tx');
+
+// DEX DOM
+const btnMintToken = document.getElementById('btn-mint-token');
+const btnCreatePool = document.getElementById('btn-create-pool');
+const btnSwapTokens = document.getElementById('btn-swap-tokens');
 
 // State
 let currentWallet = null;
@@ -170,15 +178,115 @@ btnSendTx.addEventListener('click', async () => {
     }
 });
 
+// --- DEX Logic ---
+btnMintToken.addEventListener('click', async () => {
+    if (!currentWallet) return alert("Please generate or import a wallet first!");
+    const symbol = document.getElementById('mint-symbol').value;
+    const supply = document.getElementById('mint-supply').value;
+    if (!symbol || !supply) return;
+
+    try {
+        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                privateKey: currentWallet.privateKey,
+                fromAddress: currentWallet.publicKey,
+                toAddress: DEFI_ADDRESS,
+                amount: 0,
+                type: 'CONTRACT_CALL',
+                payload: { method: 'createToken', args: { symbol, supply: parseInt(supply) } }
+            })
+        });
+        const data = await res.json();
+        if (data.error) alert(data.error);
+        else {
+            alert(`Minted ${supply} ${symbol}! Tx Hash: ` + data.hash);
+            document.getElementById('mint-symbol').value = '';
+            document.getElementById('mint-supply').value = '';
+        }
+    } catch (e) {
+        alert("Error minting token");
+    }
+});
+
+btnCreatePool.addEventListener('click', async () => {
+    if (!currentWallet) return alert("Please generate or import a wallet first!");
+    const symA = document.getElementById('pool-sym-a').value;
+    const symB = document.getElementById('pool-sym-b').value;
+    const amtA = document.getElementById('pool-amt-a').value;
+    const amtB = document.getElementById('pool-amt-b').value;
+    
+    if (!symA || !symB || !amtA || !amtB) return;
+
+    try {
+        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                privateKey: currentWallet.privateKey,
+                fromAddress: currentWallet.publicKey,
+                toAddress: DEFI_ADDRESS,
+                amount: 0,
+                type: 'CONTRACT_CALL',
+                payload: { method: 'createPool', args: { symbolA: symA, symbolB: symB, amountA: parseFloat(amtA), amountB: parseFloat(amtB) } }
+            })
+        });
+        const data = await res.json();
+        if (data.error) alert(data.error);
+        else alert(`Pool Created! Tx Hash: ` + data.hash);
+    } catch (e) {
+        alert("Error creating pool");
+    }
+});
+
+btnSwapTokens.addEventListener('click', async () => {
+    if (!currentWallet) return alert("Please generate or import a wallet first!");
+    const symIn = document.getElementById('swap-sym-in').value;
+    const symOut = document.getElementById('swap-sym-out').value;
+    const amtIn = document.getElementById('swap-amt-in').value;
+    
+    if (!symIn || !symOut || !amtIn) return;
+
+    try {
+        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({
+                privateKey: currentWallet.privateKey,
+                fromAddress: currentWallet.publicKey,
+                toAddress: DEFI_ADDRESS,
+                amount: 0,
+                type: 'CONTRACT_CALL',
+                payload: { method: 'swap', args: { symbolIn: symIn, symbolOut: symOut, amountIn: parseFloat(amtIn) } }
+            })
+        });
+        const data = await res.json();
+        if (data.error) alert(data.error);
+        else alert(`Swap Executed! Tx Hash: ` + data.hash);
+    } catch (e) {
+        alert("Error executing swap");
+    }
+});
+
 async function initDashboard() {
     document.querySelector('.status-indicator').style.background = '#eab308'; // searching yellow
     document.querySelector('.status-indicator').style.boxShadow = '0 0 8px #eab308';
     
     for (const endpoint of API_ENDPOINTS) {
         try {
-            // Fast ping with 1.5s timeout
+            // Ping with 4s timeout (Mobile + Ngrok can be slower on first connection)
             const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 1500);
+            const id = setTimeout(() => controller.abort(), 4000);
             
             const res = await fetch(`${endpoint}/blocks`, { 
                 signal: controller.signal,
