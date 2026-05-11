@@ -192,7 +192,16 @@ async function updateCustomTokens() {
         // state.balances is e.g. { "ALC": { "pubKey1": 100, "pubKey2": 50 } }
         for (const symbol in state.balances) {
             const tokenBalances = state.balances[symbol];
-            const myBalance = tokenBalances[currentWallet.publicKey];
+            
+            // Find the balance by matching trimmed keys
+            let myBalance = 0;
+            const cleanPub = currentWallet.publicKey.trim();
+            for (const holderKey in tokenBalances) {
+                if (holderKey.trim() === cleanPub) {
+                    myBalance = tokenBalances[holderKey];
+                    break;
+                }
+            }
             
             if (myBalance && myBalance > 0) {
                 hasTokens = true;
@@ -479,8 +488,12 @@ function updateWalletBalance(blocks) {
     
     blocks.forEach(block => {
         block.transactions.forEach(tx => {
-            if (tx.fromAddress === currentWallet.publicKey) balance -= tx.amount;
-            if (tx.toAddress === currentWallet.publicKey) balance += tx.amount;
+            const cleanFrom = tx.fromAddress ? tx.fromAddress.trim() : null;
+            const cleanTo = tx.toAddress ? tx.toAddress.trim() : null;
+            const cleanPub = currentWallet.publicKey.trim();
+            
+            if (cleanFrom === cleanPub) balance -= tx.amount;
+            if (cleanTo === cleanPub) balance += tx.amount;
         });
     });
     
