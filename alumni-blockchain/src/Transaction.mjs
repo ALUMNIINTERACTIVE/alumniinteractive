@@ -55,9 +55,11 @@ export class Transaction {
   }
 
   isValid() {
-    if (this.fromAddress === null) return true; // Mining reward
+    if (this.fromAddress === null || this.fromAddress === 'NETWORK_FEES') return true; // Mining reward or internal network fees
 
     if (!this.signature || this.signature.length === 0) {
+      throw new Error('No signature in this transaction');
+    }
       throw new Error('No signature in this transaction');
     }
 
