@@ -155,17 +155,31 @@ navLinks.forEach(link => {
 // --- Explorer Logic ---
 async function fetchNetworkData() {
     try {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 4000);
+        
         // Fetch Blocks
-        const blocksRes = await fetch(`${API_URL}/blocks`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        const blocksRes = await fetch(`${API_URL}/blocks`, { 
+            signal: controller.signal,
+            headers: { 'ngrok-skip-browser-warning': 'true' } 
+        });
         const blocks = await blocksRes.json();
         
         // Fetch Pending TXs
-        const pendingRes = await fetch(`${API_URL}/pending-transactions`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        const pendingRes = await fetch(`${API_URL}/pending-transactions`, { 
+            signal: controller.signal,
+            headers: { 'ngrok-skip-browser-warning': 'true' } 
+        });
         const pending = await pendingRes.json();
         
         // Fetch Validators
-        const valRes = await fetch(`${API_URL}/validators`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        const valRes = await fetch(`${API_URL}/validators`, { 
+            signal: controller.signal,
+            headers: { 'ngrok-skip-browser-warning': 'true' } 
+        });
         const validators = await valRes.json();
+        
+        clearTimeout(id);
 
         updateDashboard(blocks, pending, validators);
         
