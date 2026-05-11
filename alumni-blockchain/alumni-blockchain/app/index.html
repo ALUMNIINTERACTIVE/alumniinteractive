@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALUMNI Web3 Ecosystem</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Cryptography Library for secp256k1 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="brand">
+                <span class="logo-icon">▲</span>
+                <h1>ALUMNI</h1>
+                <span class="badge">MAINNET</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="active" data-view="explorer">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    Explorer
+                </li>
+                <li data-view="wallet">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+                    Web Wallet
+                </li>
+                <li data-view="dex">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                    DEX Swap
+                </li>
+            </ul>
+
+            <div class="node-status">
+                <div class="status-indicator"></div>
+                <span>Node Connected</span>
+                <small id="node-url">network.alumniinteractive.com:3001</small>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- VIEW: EXPLORER -->
+            <section id="view-explorer" class="view active">
+                <header class="view-header">
+                    <h2>Network Overview</h2>
+                    <div class="network-stats">
+                        <div class="stat-box glass-panel">
+                            <label>Latest Block</label>
+                            <span id="stat-block-height">0</span>
+                        </div>
+                        <div class="stat-box glass-panel">
+                            <label>Active Validators</label>
+                            <span id="stat-validators">0</span>
+                        </div>
+                        <div class="stat-box glass-panel">
+                            <label>Pending TXs</label>
+                            <span id="stat-pending">0</span>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="dashboard-grid">
+                    <div class="card glass-panel span-2">
+                        <h3>Live Ledger (Recent Blocks)</h3>
+                        <div class="table-container">
+                            <table id="blocks-table">
+                                <thead>
+                                    <tr>
+                                        <th>Block Hash</th>
+                                        <th>Age</th>
+                                        <th>TXs</th>
+                                        <th>Validator</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: WALLET -->
+            <section id="view-wallet" class="view">
+                <header class="view-header">
+                    <h2>Decentralized Wallet</h2>
+                    <p class="subtitle">Securely manage your assets and sign transactions locally.</p>
+                </header>
+
+                <div class="dashboard-grid wallet-grid">
+                    <!-- Key Management -->
+                    <div class="card glass-panel">
+                        <h3>Wallet Identity</h3>
+                        <div class="key-display">
+                            <label>Public Key (Address)</label>
+                            <div class="copyable-field" id="wallet-pub">Not Generated</div>
+                            <label style="display: flex; justify-content: space-between;">
+                                Private Key 
+                                <span id="toggle-priv-key" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Show]</span>
+                            </label>
+                            <div class="copyable-field secret" id="wallet-priv" style="filter: blur(5px); user-select: none;">Not Generated</div>
+                        </div>
+                        <div class="button-group">
+                            <button id="btn-generate-wallet" class="btn primary glow">Generate New Wallet</button>
+                            <button id="btn-import-wallet" class="btn secondary">Import Private Key</button>
+                        </div>
+                        
+                        <div id="import-wallet-form" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <textarea id="import-priv-input" placeholder="Paste Private Key (PEM format)" class="input-field" style="min-height: 80px; margin-bottom: 10px; width: 100%; box-sizing: border-box;"></textarea>
+                            <textarea id="import-pub-input" placeholder="Paste Public Key (PEM format)" class="input-field" style="min-height: 80px; margin-bottom: 10px; width: 100%; box-sizing: border-box;"></textarea>
+                            <button id="btn-submit-import" class="btn primary full-width">Confirm Import</button>
+                        </div>
+                    </div>
+
+                    <!-- Balance & Actions -->
+                    <div class="card glass-panel">
+                        <h3>Asset Balance</h3>
+                        <div class="balance-display">
+                            <span class="amount" id="wallet-balance">0.00</span>
+                            <span class="currency">ALUMNI</span>
+                        </div>
+                        
+                        <div class="transaction-form">
+                            <h4>Send Transaction</h4>
+                            <input type="text" id="tx-to" placeholder="Recipient Public Key" class="input-field">
+                            <input type="number" id="tx-amount" placeholder="Amount" class="input-field">
+                            <button id="btn-send-tx" class="btn primary full-width">Sign & Send</button>
+                        </div>
+
+                        <div class="transaction-form" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                            <h4>Validator Staking</h4>
+                            <p class="subtitle" style="font-size: 0.8rem; margin-bottom: 10px;">Stake ALUMNI to become an Active Validator.</p>
+                            <input type="number" id="tx-stake-amount" placeholder="Stake Amount" class="input-field">
+                            <button id="btn-stake-tx" class="btn secondary full-width">Stake Tokens</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: DEX SWAP -->
+            <section id="view-dex" class="view">
+                <header class="view-header">
+                    <h2>ALUMNI Swap (DEX)</h2>
+                    <p class="subtitle">Decentralized exchange for ALC-20 custom tokens using an Automated Market Maker.</p>
+                </header>
+
+                <div class="dashboard-grid">
+                    <!-- Token Forge -->
+                    <div class="card glass-panel">
+                        <h3>Token Forge</h3>
+                        <p class="subtitle" style="margin-bottom:12px; font-size:0.85rem;">Mint a new ALC-20 Token directly on-chain.</p>
+                        <input type="text" id="mint-symbol" placeholder="Token Symbol (e.g., ALC)" class="input-field">
+                        <input type="number" id="mint-supply" placeholder="Total Supply" class="input-field">
+                        <button id="btn-mint-token" class="btn secondary full-width">Mint Token</button>
+                    </div>
+
+                    <!-- Liquidity Manager -->
+                    <div class="card glass-panel">
+                        <h3>Liquidity Manager</h3>
+                        <p class="subtitle" style="margin-bottom:12px; font-size:0.85rem;">Initialize a new Liquidity Pool for trading.</p>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="pool-sym-a" placeholder="Symbol A" class="input-field">
+                            <input type="text" id="pool-sym-b" placeholder="Symbol B" class="input-field">
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <input type="number" id="pool-amt-a" placeholder="Amount A" class="input-field">
+                            <input type="number" id="pool-amt-b" placeholder="Amount B" class="input-field">
+                        </div>
+                        <button id="btn-create-pool" class="btn secondary full-width">Create Pool</button>
+                    </div>
+
+                    <!-- Swap Engine -->
+                    <div class="card glass-panel span-2" style="max-width:500px; margin: 0 auto; width:100%;">
+                        <h3 style="text-align:center;">Swap Engine</h3>
+                        <div class="transaction-form">
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px; display:block;">You Pay</label>
+                            <div style="display:flex; gap:8px; margin-bottom: 12px;">
+                                <input type="number" id="swap-amt-in" placeholder="0.0" class="input-field" style="flex:2; margin:0;">
+                                <input type="text" id="swap-sym-in" placeholder="ALUMNI" class="input-field" style="flex:1; margin:0;">
+                            </div>
+
+                            <div style="text-align:center; margin: 8px 0; color:var(--accent);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            </div>
+
+                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px; display:block;">You Receive</label>
+                            <div style="display:flex; gap:8px; margin-bottom: 24px;">
+                                <input type="text" id="swap-sym-out" placeholder="DOGE" class="input-field" style="flex:1; margin:0; width:100%;">
+                            </div>
+
+                            <button id="btn-swap-tokens" class="btn primary glow full-width">Swap Tokens</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

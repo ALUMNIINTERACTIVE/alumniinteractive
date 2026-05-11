@@ -105,12 +105,21 @@
                         <div class="key-display">
                             <label>Public Key (Address)</label>
                             <div class="copyable-field" id="wallet-pub">Not Generated</div>
-                            <label>Private Key</label>
-                            <div class="copyable-field secret" id="wallet-priv">Not Generated</div>
+                            <label style="display: flex; justify-content: space-between;">
+                                Private Key 
+                                <span id="toggle-priv-key" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Show]</span>
+                            </label>
+                            <div class="copyable-field secret" id="wallet-priv" style="filter: blur(5px); user-select: none;">Not Generated</div>
                         </div>
                         <div class="button-group">
                             <button id="btn-generate-wallet" class="btn primary glow">Generate New Wallet</button>
                             <button id="btn-import-wallet" class="btn secondary">Import Private Key</button>
+                        </div>
+                        
+                        <div id="import-wallet-form" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <textarea id="import-priv-input" placeholder="Paste Private Key (PEM format)" class="input-field" style="min-height: 80px; margin-bottom: 10px; width: 100%; box-sizing: border-box;"></textarea>
+                            <textarea id="import-pub-input" placeholder="Paste Public Key (PEM format)" class="input-field" style="min-height: 80px; margin-bottom: 10px; width: 100%; box-sizing: border-box;"></textarea>
+                            <button id="btn-submit-import" class="btn primary full-width">Confirm Import</button>
                         </div>
                     </div>
 
@@ -127,6 +136,13 @@
                             <input type="text" id="tx-to" placeholder="Recipient Public Key" class="input-field">
                             <input type="number" id="tx-amount" placeholder="Amount" class="input-field">
                             <button id="btn-send-tx" class="btn primary full-width">Sign & Send</button>
+                        </div>
+
+                        <div class="transaction-form" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                            <h4>Validator Staking</h4>
+                            <p class="subtitle" style="font-size: 0.8rem; margin-bottom: 10px;">Stake ALUMNI to become an Active Validator.</p>
+                            <input type="number" id="tx-stake-amount" placeholder="Stake Amount" class="input-field">
+                            <button id="btn-stake-tx" class="btn secondary full-width">Stake Tokens</button>
                         </div>
                     </div>
                 </div>
