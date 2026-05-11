@@ -239,12 +239,14 @@ btnEditTag.addEventListener('click', () => {
 const btnSharePub = document.getElementById('btn-share-pub');
 btnSharePub.addEventListener('click', async () => {
     if (!currentWallet) return;
-    const cleanKey = stripPemHeaders(currentWallet.publicKey);
+    // We must share the exact cryptographic string (PEM format) including headers, 
+    // otherwise the backend validator network will reject it due to format mismatch.
+    const fullPemKey = currentWallet.publicKey;
     if (navigator.share) {
         try {
             await navigator.share({
                 title: 'Alumni Blockchain Wallet',
-                text: `Send assets to my ALUMNI Wallet Address:\n\n${cleanKey}`
+                text: `Send assets to my ALUMNI Wallet Address (Keep exactly as formatted, do not remove headers):\n\n${fullPemKey}`
             });
         } catch (e) {
             console.error("Share failed", e);

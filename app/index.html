@@ -268,8 +268,8 @@
                         
                         <ul style="margin-top: 20px; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; padding-left: 20px;">
                             <li><strong>Create an Identity:</strong> Go to the Web Wallet tab and click "Generate New Web3 Wallet". Set your custom <code>@ALUMNI.TAG</code> so friends can easily send you funds.</li>
-                            <li><strong>Receive Funds:</strong> Click your alias in the wallet to silently copy your raw Public Key, or click "Share Address" to send your QR code or Tag to someone else.</li>
-                            <li><strong>Send Transactions:</strong> You can paste an Alias or scan a friend's QR code. The system will automatically resolve the identity and process the transfer.</li>
+                            <li><strong>Receive Funds:</strong> Click your alias in the wallet to silently copy your raw Public Key, or click "Share Address" to send your QR code or Tag to someone else. <em>Note: Cryptographic keys use strict PEM formatting. Always keep the <code>-----BEGIN...</code> and <code>-----END...</code> headers intact!</em></li>
+                            <li><strong>Send Transactions:</strong> You can paste an Alias, scan a friend's QR code, or paste their full PEM string. The system will automatically resolve the identity and process the transfer.</li>
                             <li><strong>Mint Custom Tokens:</strong> Navigate to the DEX Swap tab. Input a Token Ticker (e.g., "USDT") and an amount to deploy your very own ALC-20 smart contract instantly.</li>
                             <li><strong>Become a Validator:</strong> The ALUMNI network runs on Proof-of-Stake. Navigate to your Web Wallet, enter an amount, and stake at least <strong>50 ALUMNI</strong> to turn your device into an active network validator!</li>
                         </ul>
@@ -289,6 +289,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
 </body>
 </html>
