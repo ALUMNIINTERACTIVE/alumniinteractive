@@ -53,7 +53,7 @@ if (alumniCoin.chain.length === 1 && totalStaked === 0) {
     
     // 4. Auto-Stake 50 ALUMNI to lock the network into PoS Mode
     const stakeTx = new Transaction(nodeWallet.publicKey, '0000000000000000000000000000000000000000', 50, TransactionType.STAKE);
-    stakeTx.signTransaction(nodeWallet.keyPair);
+    stakeTx.signTransaction(nodeWallet);
     alumniCoin.addTransaction(stakeTx);
     
     // Mine the staking block
