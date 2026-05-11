@@ -1,5 +1,5 @@
 const API_ENDPOINTS = [
-    'https://network.alumniinteractive.com',
+    'https://spinner-helpline-gout.ngrok-free.dev',
     'http://10.0.0.99:3001',
     'http://127.0.0.1:3001'
 ];
