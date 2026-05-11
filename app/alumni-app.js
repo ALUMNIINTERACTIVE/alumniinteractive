@@ -161,21 +161,24 @@ async function fetchNetworkData() {
         // Fetch Blocks
         const blocksRes = await fetch(`${API_URL}/blocks`, { 
             signal: controller.signal,
-            headers: { 'ngrok-skip-browser-warning': 'true' } 
+            cache: 'no-store',
+            headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
         });
         const blocks = await blocksRes.json();
         
         // Fetch Pending TXs
         const pendingRes = await fetch(`${API_URL}/pending-transactions`, { 
             signal: controller.signal,
-            headers: { 'ngrok-skip-browser-warning': 'true' } 
+            cache: 'no-store',
+            headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
         });
         const pending = await pendingRes.json();
         
         // Fetch Validators
         const valRes = await fetch(`${API_URL}/validators`, { 
             signal: controller.signal,
-            headers: { 'ngrok-skip-browser-warning': 'true' } 
+            cache: 'no-store',
+            headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
         });
         const validators = await valRes.json();
         
