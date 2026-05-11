@@ -161,24 +161,21 @@ async function fetchNetworkData() {
         // Fetch Blocks
         const blocksRes = await fetch(`${API_URL}/blocks?t=${Date.now()}`, { 
             signal: controller.signal,
-            cache: 'no-store',
-            headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
+            cache: 'no-store'
         });
         const blocks = await blocksRes.json();
         
         // Fetch Pending TXs
         const pendingRes = await fetch(`${API_URL}/pending-transactions?t=${Date.now()}`, { 
             signal: controller.signal,
-            cache: 'no-store',
-            headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
+            cache: 'no-store'
         });
         const pending = await pendingRes.json();
         
         // Fetch Validators
         const valRes = await fetch(`${API_URL}/validators?t=${Date.now()}`, { 
             signal: controller.signal,
-            cache: 'no-store',
-            headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' } 
+            cache: 'no-store'
         });
         const validators = await valRes.json();
         
@@ -821,8 +818,7 @@ async function initDashboard() {
             
             const res = await fetch(`${endpoint}/blocks?t=${Date.now()}`, { 
                 signal: controller.signal,
-                cache: 'no-store',
-                headers: { 'ngrok-skip-browser-warning': 'true', 'Cache-Control': 'no-cache' }
+                cache: 'no-store'
             });
             clearTimeout(id);
             
