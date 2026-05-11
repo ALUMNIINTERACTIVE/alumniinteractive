@@ -17,6 +17,7 @@ const statPending = document.getElementById('stat-pending');
 const blocksTable = document.querySelector('#blocks-table tbody');
 
 // Wallet DOM
+const walletSelector = document.getElementById('wallet-selector');
 const btnGenerate = document.getElementById('btn-generate-wallet');
 const btnImport = document.getElementById('btn-import-wallet');
 const importForm = document.getElementById('import-wallet-form');
@@ -71,7 +72,6 @@ if (alumniWallets.length > 0) {
 renderWalletSelector();
 
 // DOM Selector rendering
-const walletSelector = document.getElementById('wallet-selector');
 function renderWalletSelector() {
     if (!walletSelector) return;
     walletSelector.innerHTML = '<option value="" disabled>Select Wallet...</option>';
