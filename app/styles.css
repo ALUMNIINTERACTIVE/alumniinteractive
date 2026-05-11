@@ -304,6 +304,25 @@ td {
 }
 
 /* Forms & Buttons */
+.token-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.token-item .token-symbol {
+    font-weight: 600;
+    color: var(--accent-light);
+}
+
+.token-item .token-balance {
+    font-family: 'Space Mono', monospace;
+}
+
 .input-field {
     width: 100%;
     background: rgba(0, 0, 0, 0.2);

@@ -80,6 +80,7 @@ async function fetchNetworkData() {
         
         if (currentWallet) {
             updateWalletBalance(blocks);
+            updateCustomTokens();
             // Ensure keys are visually rendered if loaded from storage
             if (pubKeyField.textContent === 'Not Generated') {
                 pubKeyField.textContent = formatKeyDisplay(currentWallet.publicKey);
@@ -92,6 +93,47 @@ async function fetchNetworkData() {
         console.error('Failed to connect to node:', err);
         document.querySelector('.status-indicator').style.background = '#ef4444';
         document.querySelector('.status-indicator').style.boxShadow = '0 0 8px #ef4444';
+    }
+}
+
+async function updateCustomTokens() {
+    if (!currentWallet) return;
+    try {
+        const res = await fetch(`${API_URL}/state/${DEFI_ADDRESS}`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        const state = await res.json();
+        
+        const container = document.getElementById('token-list');
+        container.innerHTML = ''; // clear
+
+        if (!state.balances || Object.keys(state.balances).length === 0) {
+            container.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>';
+            return;
+        }
+
+        let hasTokens = false;
+        
+        // state.balances is e.g. { "ALC": { "pubKey1": 100, "pubKey2": 50 } }
+        for (const symbol in state.balances) {
+            const tokenBalances = state.balances[symbol];
+            const myBalance = tokenBalances[currentWallet.publicKey];
+            
+            if (myBalance && myBalance > 0) {
+                hasTokens = true;
+                const div = document.createElement('div');
+                div.className = 'token-item';
+                div.innerHTML = `
+                    <span class="token-symbol">${symbol}</span>
+                    <span class="token-balance">${myBalance.toLocaleString()}</span>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        if (!hasTokens) {
+            container.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>';
+        }
+    } catch (e) {
+        console.error("Failed to fetch custom tokens:", e);
     }
 }
 
@@ -271,7 +313,8 @@ btnStakeTx.addEventListener('click', async () => {
 });
 
 // --- DEX Logic ---
-btnMintToken.addEventListener('click', async () => {
+btnMintToken.addEventListener('click', async (e) => {
+    e.preventDefault();
     console.log("MINT BUTTON CLICKED!", currentWallet);
     if (!currentWallet) return alert("Please generate or import a wallet first!");
     const symbol = document.getElementById('mint-symbol').value;
@@ -280,6 +323,11 @@ btnMintToken.addEventListener('click', async () => {
     if (!symbol || !supply) return console.log("Returned early due to missing symbol or supply");
 
     try {
+        const btn = document.getElementById('btn-mint-token');
+        const originalText = btn.textContent;
+        btn.textContent = 'Minting...';
+        btn.style.opacity = '0.5';
+
         console.log("Fetching...", API_URL);
         const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
             method: 'POST',
@@ -299,15 +347,31 @@ btnMintToken.addEventListener('click', async () => {
         console.log("Fetch finished! Status:", res.status);
         const data = await res.json();
         console.log("Parsed JSON data:", data);
-        if (data.error) alert(data.error);
-        else {
+        
+        btn.textContent = originalText;
+        btn.style.opacity = '1';
+
+        if (data.error) {
+            btn.textContent = 'Error!';
+            setTimeout(() => btn.textContent = originalText, 2000);
+            alert(data.error);
+        } else {
+            btn.textContent = 'Success!';
+            setTimeout(() => btn.textContent = originalText, 2000);
             alert(`Minted ${supply} ${symbol}! Tx Hash: ` + data.hash);
             document.getElementById('mint-symbol').value = '';
             document.getElementById('mint-supply').value = '';
         }
-    } catch (e) {
-        console.error("MINT ERROR:", e);
-        alert("Error minting token: " + e.message);
+    } catch (err) {
+        console.error("MINT ERROR:", err);
+        const btn = document.getElementById('btn-mint-token');
+        btn.textContent = 'Network Error';
+        btn.style.background = '#ef4444';
+        setTimeout(() => {
+            btn.textContent = 'Mint Token';
+            btn.style.background = '';
+        }, 3000);
+        alert("Error minting token: " + err.message);
     }
 });
 
@@ -344,7 +408,8 @@ btnCreatePool.addEventListener('click', async () => {
     }
 });
 
-btnSwapTokens.addEventListener('click', async () => {
+btnSwapTokens.addEventListener('click', async (e) => {
+    e.preventDefault();
     if (!currentWallet) return alert("Please generate or import a wallet first!");
     const symIn = document.getElementById('swap-sym-in').value;
     const symOut = document.getElementById('swap-sym-out').value;
@@ -353,6 +418,11 @@ btnSwapTokens.addEventListener('click', async () => {
     if (!symIn || !symOut || !amtIn) return;
 
     try {
+        const btn = document.getElementById('btn-swap-tokens');
+        const originalText = btn.textContent;
+        btn.textContent = 'Swapping...';
+        btn.style.opacity = '0.5';
+
         const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
             method: 'POST',
             headers: { 
@@ -369,10 +439,31 @@ btnSwapTokens.addEventListener('click', async () => {
             })
         });
         const data = await res.json();
-        if (data.error) alert(data.error);
-        else alert(`Swap Executed! Tx Hash: ` + data.hash);
-    } catch (e) {
-        alert("Error executing swap");
+        
+        btn.textContent = originalText;
+        btn.style.opacity = '1';
+
+        if (data.error) {
+            btn.textContent = 'Error!';
+            setTimeout(() => btn.textContent = originalText, 2000);
+            alert(data.error);
+        } else {
+            btn.textContent = 'Success!';
+            setTimeout(() => btn.textContent = originalText, 2000);
+            alert(`Swap Executed! Tx Hash: ` + data.hash);
+            document.getElementById('swap-sym-in').value = '';
+            document.getElementById('swap-sym-out').value = '';
+            document.getElementById('swap-amt-in').value = '';
+        }
+    } catch (err) {
+        const btn = document.getElementById('btn-swap-tokens');
+        btn.textContent = 'Network Error';
+        btn.style.background = '#ef4444';
+        setTimeout(() => {
+            btn.textContent = 'Swap Tokens';
+            btn.style.background = '';
+        }, 3000);
+        alert("Error executing swap: " + err.message);
     }
 });
 

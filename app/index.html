@@ -126,9 +126,17 @@
                     <!-- Balance & Actions -->
                     <div class="card glass-panel">
                         <h3>Asset Balance</h3>
-                        <div class="balance-display">
+                        <div class="balance-display" style="margin-bottom: 10px;">
                             <span class="amount" id="wallet-balance">0.00</span>
                             <span class="currency">ALUMNI</span>
+                        </div>
+
+                        <!-- Custom Token Portfolio -->
+                        <div class="token-portfolio" id="token-portfolio-container" style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; margin-bottom: 24px;">
+                            <h4 style="margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">Custom Tokens</h4>
+                            <div id="token-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                <div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>
+                            </div>
                         </div>
                         
                         <div class="transaction-form">
