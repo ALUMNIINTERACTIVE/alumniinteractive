@@ -108,12 +108,16 @@
                         <div class="key-display">
                             <label style="display: flex; justify-content: space-between;">
                                 Public Key (Address)
-                                <span id="btn-show-qr" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Show QR]</span>
+                                <div style="display: flex; gap: 8px;">
+                                    <span id="btn-edit-tag" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Edit Tag]</span>
+                                    <span id="btn-show-qr" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Show QR]</span>
+                                    <span id="btn-share-pub" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Share]</span>
+                                </div>
                             </label>
                             <div id="qr-display-container" style="display: none; justify-content: center; margin-top: 8px; margin-bottom: 12px; background: white; padding: 10px; border-radius: 8px; width: fit-content; margin-left: auto; margin-right: auto;">
                                 <canvas id="qr-canvas"></canvas>
                             </div>
-                            <div class="copyable-field" id="wallet-pub">Not Generated</div>
+                            <div class="copyable-field" id="wallet-pub" title="Click to copy full public key" style="cursor: pointer; transition: all 0.2s;">Not Generated</div>
                             <label style="display: flex; justify-content: space-between;">
                                 Private Key 
                                 <span id="toggle-priv-key" style="cursor:pointer; color: var(--alumni-cyan); font-weight: normal; font-size: 0.8rem; display: none;">[Show]</span>

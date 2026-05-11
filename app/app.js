@@ -97,11 +97,12 @@ async function fetchNetworkData() {
             updateCustomTokens();
             // Ensure keys are visually rendered if loaded from storage
             if (pubKeyField.textContent === 'Not Generated') {
-                pubKeyField.textContent = formatKeyDisplay(currentWallet.publicKey);
+                pubKeyField.textContent = formatAlias(currentWallet.publicKey);
                 privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
                 togglePrivKey.style.display = 'inline';
-                const btnShowQr = document.getElementById('btn-show-qr');
-                if (btnShowQr) btnShowQr.style.display = 'inline';
+                document.getElementById('btn-show-qr').style.display = 'inline';
+                document.getElementById('btn-edit-tag').style.display = 'inline';
+                document.getElementById('btn-share-pub').style.display = 'inline';
             }
         }
 
@@ -184,6 +185,75 @@ function formatKeyDisplay(keyPem) {
     return keyPem.replace(/-----BEGIN[^-]*-----/g, '').replace(/-----END[^-]*-----/g, '').replace(/\s+/g, '');
 }
 
+function stripPemHeaders(keyPem) {
+    return keyPem.replace(/-----BEGIN[^-]*-----/g, '').replace(/-----END[^-]*-----/g, '').replace(/\s+/g, '');
+}
+
+function restorePemHeaders(b64) {
+    if (!b64 || b64.includes('-----BEGIN')) return b64;
+    const formatted = b64.match(/.{1,64}/g).join('\n');
+    return `-----BEGIN PUBLIC KEY-----\n${formatted}\n-----END PUBLIC KEY-----\n`;
+}
+
+let customAlias = localStorage.getItem('alumni_wallet_alias');
+
+function formatAlias(keyPem) {
+    if (!keyPem) return 'Not Generated';
+    if (customAlias) return `@ALUMNI.${customAlias}`;
+    const b64 = stripPemHeaders(keyPem);
+    return `@ALUMNI.${b64.substring(0, 8)}`;
+}
+
+// Click to Copy for Alias
+pubKeyField.addEventListener('click', async () => {
+    if (currentWallet && currentWallet.publicKey) {
+        try {
+            await navigator.clipboard.writeText(currentWallet.publicKey);
+            const originalText = pubKeyField.textContent;
+            pubKeyField.textContent = 'Copied to clipboard!';
+            setTimeout(() => { pubKeyField.textContent = originalText; }, 2000);
+        } catch (err) {
+            console.error('Failed to copy', err);
+        }
+    }
+});
+
+const btnEditTag = document.getElementById('btn-edit-tag');
+btnEditTag.addEventListener('click', () => {
+    const newTag = prompt("Enter your custom ALUMNI Tag (e.g. SATOSHI):", customAlias || "");
+    if (newTag !== null) {
+        const cleanTag = newTag.trim().replace(/[^a-zA-Z0-9_-]/g, '').toUpperCase();
+        if (cleanTag) {
+            customAlias = cleanTag;
+            localStorage.setItem('alumni_wallet_alias', customAlias);
+        } else {
+            customAlias = null;
+            localStorage.removeItem('alumni_wallet_alias');
+        }
+        if (currentWallet) {
+            pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+        }
+    }
+});
+
+const btnSharePub = document.getElementById('btn-share-pub');
+btnSharePub.addEventListener('click', async () => {
+    if (!currentWallet) return;
+    const cleanKey = stripPemHeaders(currentWallet.publicKey);
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Alumni Blockchain Wallet',
+                text: `Send assets to my ALUMNI Wallet Address:\n\n${cleanKey}`
+            });
+        } catch (e) {
+            console.error("Share failed", e);
+        }
+    } else {
+        alert("Web Share API is not supported on this browser/device.");
+    }
+});
+
 togglePrivKey.addEventListener('click', () => {
     if (privKeyField.style.filter === 'blur(5px)') {
         privKeyField.style.filter = 'none';
@@ -205,11 +275,12 @@ btnGenerate.addEventListener('click', async () => {
         currentWallet = keys;
         localStorage.setItem('alumni_wallet', JSON.stringify(currentWallet));
         
-        pubKeyField.textContent = formatKeyDisplay(keys.publicKey);
+        pubKeyField.textContent = formatAlias(keys.publicKey);
         privKeyField.textContent = formatKeyDisplay(keys.privateKey);
         togglePrivKey.style.display = 'inline';
-        const btnShowQr = document.getElementById('btn-show-qr');
-        if (btnShowQr) btnShowQr.style.display = 'inline';
+        document.getElementById('btn-show-qr').style.display = 'inline';
+        document.getElementById('btn-edit-tag').style.display = 'inline';
+        document.getElementById('btn-share-pub').style.display = 'inline';
         
         alert('Wallet generated successfully! Keep your private key safe.');
         fetchNetworkData(); // trigger balance update
@@ -230,11 +301,12 @@ btnSubmitImport.addEventListener('click', () => {
         currentWallet = { privateKey: pk, publicKey: pub };
         localStorage.setItem('alumni_wallet', JSON.stringify(currentWallet));
         
-        pubKeyField.textContent = formatKeyDisplay(pub);
+        pubKeyField.textContent = formatAlias(pub);
         privKeyField.textContent = formatKeyDisplay(pk);
         togglePrivKey.style.display = 'inline';
-        const btnShowQr = document.getElementById('btn-show-qr');
-        if (btnShowQr) btnShowQr.style.display = 'inline';
+        document.getElementById('btn-show-qr').style.display = 'inline';
+        document.getElementById('btn-edit-tag').style.display = 'inline';
+        document.getElementById('btn-share-pub').style.display = 'inline';
         
         importForm.style.display = 'none';
         importPriv.value = '';
@@ -256,7 +328,7 @@ btnShowQr.addEventListener('click', () => {
     if (qrContainer.style.display === 'none') {
         new QRious({
             element: qrCanvas,
-            value: currentWallet.publicKey,
+            value: stripPemHeaders(currentWallet.publicKey),
             size: 200,
             background: 'white',
             foreground: 'black'
@@ -284,7 +356,7 @@ btnScanQr.addEventListener('click', (e) => {
         
     html5QrcodeScanner.render((decodedText, decodedResult) => {
         // Success Callback
-        document.getElementById('tx-to').value = decodedText;
+        document.getElementById('tx-to').value = restorePemHeaders(decodedText);
         closeScanner();
     }, (errorMessage) => {
         // Parse error, ignore
