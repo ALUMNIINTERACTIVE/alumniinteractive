@@ -460,6 +460,7 @@ const btnShowQr = document.getElementById('btn-show-qr');
 const qrContainer = document.getElementById('qr-display-container');
 const qrCanvas = document.getElementById('qr-canvas');
 
+if (btnShowQr) {
 btnShowQr.addEventListener('click', () => {
     if (!currentWallet) return;
     if (qrContainer.style.display === 'none') {
@@ -479,6 +480,7 @@ btnShowQr.addEventListener('click', () => {
         btnShowQr.textContent = '[Show QR]';
     }
 });
+}
 
 let html5QrcodeScanner = null;
 const btnScanQr = document.getElementById('btn-scan-qr');
