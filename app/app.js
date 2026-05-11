@@ -296,8 +296,8 @@ btnImport.addEventListener('click', () => {
 });
 
 btnSubmitImport.addEventListener('click', () => {
-    const pk = importPriv.value.trim();
-    const pub = importPub.value.trim();
+    const pk = importPriv.value.trim().replace(/\\n/g, '\n');
+    const pub = importPub.value.trim().replace(/\\n/g, '\n');
     
     if (pk && pub) {
         currentWallet = { privateKey: pk, publicKey: pub };
