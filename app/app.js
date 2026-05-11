@@ -1,4 +1,5 @@
 const API_ENDPOINTS = [
+    'https://spinner-helpline-gout.ngrok-free.dev',
     'http://network.alumniinteractive.com:3001',
     'http://10.0.0.99:3001',
     'http://127.0.0.1:3001'
@@ -40,15 +41,15 @@ navLinks.forEach(link => {
 async function fetchNetworkData() {
     try {
         // Fetch Blocks
-        const blocksRes = await fetch(`${API_URL}/blocks`);
+        const blocksRes = await fetch(`${API_URL}/blocks`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         const blocks = await blocksRes.json();
         
         // Fetch Pending TXs
-        const pendingRes = await fetch(`${API_URL}/pending-transactions`);
+        const pendingRes = await fetch(`${API_URL}/pending-transactions`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         const pending = await pendingRes.json();
         
         // Fetch Validators
-        const valRes = await fetch(`${API_URL}/validators`);
+        const valRes = await fetch(`${API_URL}/validators`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         const validators = await valRes.json();
 
         updateDashboard(blocks, pending, validators);
@@ -93,7 +94,7 @@ function updateDashboard(blocks, pending, validators) {
 // --- Wallet Logic ---
 btnGenerate.addEventListener('click', async () => {
     try {
-        const res = await fetch(`${API_URL}/wallet/generate`);
+        const res = await fetch(`${API_URL}/wallet/generate`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
         const keys = await res.json();
         
         currentWallet = keys;
@@ -143,7 +144,10 @@ btnSendTx.addEventListener('click', async () => {
     try {
         const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
             body: JSON.stringify({
                 privateKey: currentWallet.privateKey,
                 fromAddress: currentWallet.publicKey,
@@ -176,7 +180,10 @@ async function initDashboard() {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), 1500);
             
-            const res = await fetch(`${endpoint}/blocks`, { signal: controller.signal });
+            const res = await fetch(`${endpoint}/blocks`, { 
+                signal: controller.signal,
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             clearTimeout(id);
             
             if (res.ok) {
