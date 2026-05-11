@@ -555,49 +555,13 @@ btnStakeTx.addEventListener('click', async () => {
         const result = await res.json();
         if (result.error) alert(result.error);
         else {
-            alert('Stake Transaction Sent! You are now an active Delegator/Validator. Tx Hash: ' + result.hash);
+            alert(`Successfully staked ${amount} ALUMNI to become a Delegator/Validator! Tx Hash: ` + result.hash);
             document.getElementById('tx-stake-amount').value = '';
             fetchNetworkData();
         }
     } catch (err) {
-    } catch (err) {
         console.error(err);
         alert('Network error');
-    }
-});
-
-btnStakeTx.addEventListener('click', async () => {
-    if (!currentWallet) return alert('Please generate or import a wallet first.');
-    
-    const amount = parseFloat(document.getElementById('tx-stake-amount').value);
-    
-    if (!amount || amount < 50) return alert('Minimum stake is 50 ALUMNI to become a validator.');
-
-    try {
-        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({
-                privateKey: currentWallet.privateKey,
-                fromAddress: currentWallet.publicKey,
-                toAddress: currentWallet.publicKey, // staking to self
-                amount: amount,
-                type: 'STAKE'
-            })
-        });
-        
-        const result = await res.json();
-        if (result.error) throw new Error(result.error);
-        
-        alert(`Successfully staked ${amount} ALUMNI to become a Validator! Tx Hash: ` + result.hash);
-        document.getElementById('tx-stake-amount').value = '';
-        
-        fetchNetworkData();
-    } catch (err) {
-        alert('Stake Failed: ' + err.message);
     }
 });
 
