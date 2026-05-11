@@ -35,7 +35,7 @@ if (alumniCoin.chain.length === 1 && totalStaked === 0) {
     const fs = await import('fs');
     
     // 1. Set the ALUMNI Ecosystem Treasury Wallet (@ALUMNI.SATOSHI)
-    const treasuryPublicKey = 'MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAENwPfFbba+A9l6uFutbQucAOUgPQNujNnTl+oXgr5F0U+SPynvHJbC07kXms5iYwEAtqT1D3ErWnPX+a6XE7NtQ==';
+    const treasuryPublicKey = "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAENwPfFbba+A9l6uFutbQucAOUgPQNujNn\nTl+oXgr5F0U+SPynvHJbC07kXms5iYwEAtqT1D3ErWnPX+a6XE7NtQ==\n-----END PUBLIC KEY-----\n";
     console.log(`🏦 Treasury Address locked to @ALUMNI.SATOSHI`);
     
     // 2. Genesis Pre-mine: 10,000,000 ALUMNI to Treasury (10% of Max Supply)
