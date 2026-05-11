@@ -68,6 +68,8 @@ if (alumniWallets.length > 0) {
     currentWallet = alumniWallets[activeWalletIndex] || alumniWallets[0];
 }
 
+renderWalletSelector();
+
 // DOM Selector rendering
 const walletSelector = document.getElementById('wallet-selector');
 function renderWalletSelector() {
@@ -111,6 +113,14 @@ if (walletSelector) {
         }
     });
     renderWalletSelector();
+    if (currentWallet) {
+        pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+        privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
+        togglePrivKey.style.display = 'inline';
+        document.getElementById('btn-show-qr').style.display = 'inline';
+        document.getElementById('btn-share-pub').style.display = 'inline';
+        document.getElementById('btn-edit-tag').style.display = 'inline';
+    }
 }
 
 // --- Navigation ---
