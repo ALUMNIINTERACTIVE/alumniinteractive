@@ -253,8 +253,7 @@ async function updateCustomTokens() {
 }
 
 function updateDashboard(blocks, pending, validators) {
-    document.querySelector('.status-indicator').style.background = '#10b981';
-    document.querySelector('.status-indicator').style.boxShadow = '0 0 8px #10b981';
+    document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></div>Node Connected<br><span style="font-size:0.7rem;opacity:0.6">Alumni Blockchain</span>`;
     
     statBlockHeight.textContent = blocks.length;
     statPending.textContent = pending.length;
