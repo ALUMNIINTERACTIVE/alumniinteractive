@@ -20,7 +20,10 @@ export class HttpApi {
         return;
       }
 
-      if (req.method === 'GET' && req.url === '/blocks') {
+      // Parse the pathname to ignore query strings like ?t=12345
+      const urlPath = req.url.split('?')[0];
+
+      if (req.method === 'GET' && urlPath === '/blocks') {
         // Strip trailing newlines from addresses so frontend string matching always succeeds
         const cleanChain = this.blockchain.chain.map(block => ({
             ...block,
@@ -33,15 +36,15 @@ export class HttpApi {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(cleanChain, null, 2));
       }
-      else if (req.method === 'GET' && req.url === '/pending-transactions') {
+      else if (req.method === 'GET' && urlPath === '/pending-transactions') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(this.blockchain.pendingTransactions, null, 2));
       }
-      else if (req.method === 'GET' && req.url === '/validators') {
+      else if (req.method === 'GET' && urlPath === '/validators') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(this.blockchain.validators, null, 2));
       }
-      else if (req.method === 'GET' && req.url === '/wallet/generate') {
+      else if (req.method === 'GET' && urlPath === '/wallet/generate') {
         import('crypto').then(({ generateKeyPairSync }) => {
           const { publicKey, privateKey } = generateKeyPairSync('ec', {
             namedCurve: 'secp256k1',
