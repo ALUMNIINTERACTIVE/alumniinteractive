@@ -107,7 +107,7 @@ if (walletSelector) {
             currentWallet = alumniWallets[idx];
             localStorage.setItem('alumni_active_wallet_idx', idx);
             // Refresh UI
-            if (pubKeyField) pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+            if (pubKeyField) pubKeyField.textContent = formatFullKey(currentWallet.publicKey);
             if (privKeyField) privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
             
             const accountNameField = document.getElementById('wallet-account-name');
@@ -118,7 +118,7 @@ if (walletSelector) {
     });
     renderWalletSelector();
     if (currentWallet) {
-        if (pubKeyField) pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+        if (pubKeyField) pubKeyField.textContent = formatFullKey(currentWallet.publicKey);
         if (privKeyField) privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
         
         const accountNameField = document.getElementById('wallet-account-name');
@@ -274,7 +274,7 @@ async function fetchNetworkData() {
             updateCustomTokens();
             // Ensure keys are visually rendered if loaded from storage
             if (pubKeyField.textContent === 'Not Generated') {
-                pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+                pubKeyField.textContent = formatFullKey(currentWallet.publicKey);
                 privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
                 togglePrivKey.style.display = 'inline';
                 document.getElementById('btn-show-qr').style.display = 'inline';
@@ -439,10 +439,23 @@ function stripPemHeaders(keyPem) {
     return keyPem.replace(/-----BEGIN[^-]*-----/g, '').replace(/-----END[^-]*-----/g, '').replace(/\s+/g, '');
 }
 
-function restorePemHeaders(b64) {
-    if (!b64 || b64.includes('-----BEGIN')) return b64;
-    const formatted = b64.match(/.{1,64}/g).join('\n');
+function restorePemHeaders(input) {
+    if (!input) return input;
+    // Strip everything except the raw base64 payload
+    let rawBase64 = input.replace(/-----BEGIN PUBLIC KEY-----/g, '')
+                         .replace(/-----END PUBLIC KEY-----/g, '')
+                         .replace(/\s+/g, '');
+                         
+    if (rawBase64.length === 0) return input;
+    
+    // Chunk into 64 characters and reconstruct strict PEM
+    const formatted = rawBase64.match(/.{1,64}/g).join('\n');
     return `-----BEGIN PUBLIC KEY-----\n${formatted}\n-----END PUBLIC KEY-----\n`;
+}
+
+function formatFullKey(keyPem) {
+    if (!keyPem) return 'Not Generated';
+    return keyPem.replace(/\n/g, '');
 }
 
 function formatAlias(keyPem) {
@@ -491,7 +504,7 @@ btnEditTag.addEventListener('click', () => {
         localStorage.setItem('alumni_wallets', JSON.stringify(alumniWallets));
         renderWalletSelector();
         
-        pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+        pubKeyField.textContent = formatFullKey(currentWallet.publicKey);
     }
 });
 }
@@ -577,7 +590,7 @@ btnGenerate.addEventListener('click', async () => {
         localStorage.setItem('alumni_active_wallet_idx', alumniWallets.length - 1);
         renderWalletSelector();
         
-        pubKeyField.textContent = formatAlias(data.publicKey);
+        pubKeyField.textContent = formatFullKey(data.publicKey);
         privKeyField.textContent = formatKeyDisplay(data.privateKey);
         
         const accountNameField = document.getElementById('wallet-account-name');
@@ -630,7 +643,7 @@ btnSubmitImport.addEventListener('click', () => {
     localStorage.setItem('alumni_active_wallet_idx', alumniWallets.length - 1);
     renderWalletSelector();
     
-    pubKeyField.textContent = formatAlias(pub);
+    pubKeyField.textContent = formatFullKey(pub);
     privKeyField.textContent = formatKeyDisplay(pk);
     
     const accountNameField = document.getElementById('wallet-account-name');
@@ -671,7 +684,7 @@ if (btnShowQr) {
         
         const addrText = document.getElementById('receive-address-text');
         if(addrText) {
-            addrText.textContent = stripPemHeaders(currentWallet.publicKey);
+          if (addrText) addrText.textContent = formatFullKey(currentWallet.publicKey);
         }
     });
 }

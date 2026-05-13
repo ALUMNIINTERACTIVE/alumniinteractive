@@ -346,7 +346,7 @@
                         <!-- Selected Account Details -->
                         <div style="margin-bottom: 12px; font-size: 0.85rem; color: var(--text-muted);">Current Active Account:</div>
                         <div class="input-field" style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: none; margin-bottom: 8px;">
-                            <span id="wallet-pub" style="overflow: hidden; text-overflow: ellipsis;">Not Generated</span>
+                            <span id="wallet-pub" style="word-break: break-all; white-space: pre-wrap; font-size: 11px;">Not Generated</span>
                             <span id="btn-share-pub" style="color: var(--accent); cursor: pointer; padding-left: 10px;">Copy</span>
                         </div>
                         <div class="input-field secret" style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: none;">
@@ -403,7 +403,6 @@
                     </div>
                     <div id="qr-display-container" style="background: white; padding: 16px; border-radius: 16px; display: inline-block; margin-bottom: 20px; position: relative;">
                         <canvas id="qr-canvas"></canvas>
-                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 4px; border-radius: 8px; color: #10b981; font-size: 32px; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; line-height: 1;">▲</div>
                     </div>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; word-break: break-all;" id="receive-address-text">Scan address to receive payment</p>
                     <button id="btn-copy-address" class="btn secondary full-width" style="margin-bottom: 12px;">Copy Address</button>
