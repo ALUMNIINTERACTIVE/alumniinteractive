@@ -31,7 +31,7 @@ const privKeyField = document.getElementById('wallet-priv');
 const togglePrivKey = document.getElementById('toggle-priv-key');
 const balanceField = document.getElementById('wallet-balance');
 const btnSendTx = document.getElementById('btn-send-tx');
-const btnStakeTx = document.getElementById('btn-stake-tx');
+
 
 // DEX DOM
 
@@ -393,6 +393,32 @@ function updateDashboard(blocks, pending, validators) {
         `;
         blocksTable.appendChild(tr);
     });
+
+    let isStaked = false;
+    if (currentWallet && validators[currentWallet.publicKey] >= 50) {
+        isStaked = true;
+    }
+    const btnStartMiner = document.getElementById('btn-start-miner');
+    if (btnStartMiner) {
+        if (isStaked) {
+            btnStartMiner.disabled = false;
+            if (document.getElementById('miner-status').textContent === 'Standby') {
+                btnStartMiner.textContent = 'Start Mobile Mining';
+            }
+        } else {
+            btnStartMiner.disabled = true;
+            btnStartMiner.textContent = 'Requires 50 ALUMNI Stake';
+            const minerStatus = document.getElementById('miner-status');
+            if (minerStatus && minerStatus.textContent === 'Mining Active') {
+                // If mining was active but they unstaked somehow, stop it.
+                clearInterval(window.miningInterval);
+                minerStatus.textContent = 'Standby';
+                minerStatus.style.color = '#9e9ea7';
+                document.getElementById('miner-hashrate').textContent = '0.0 H/s';
+                btnStartMiner.style.background = '';
+            }
+        }
+    }
 }
 
 function formatKeyDisplay(keyPem) {
@@ -852,40 +878,7 @@ btnSendTx.addEventListener('click', async () => {
     }
 });
 
-btnStakeTx.addEventListener('click', async () => {
-    if (!currentWallet) return alert('Please generate or import a wallet first.');
-    const amount = parseFloat(document.getElementById('tx-stake-amount').value);
-    
-    if (!amount || amount < 50) return alert('Minimum stake is 50 ALUMNI.');
 
-    try {
-        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({
-                privateKey: currentWallet.privateKey,
-                fromAddress: currentWallet.publicKey,
-                toAddress: currentWallet.publicKey, // You stake to yourself for native validating
-                amount: amount,
-                type: 'STAKE'
-            })
-        });
-        
-        const result = await res.json();
-        if (result.error) alert(result.error);
-        else {
-            alert(`Successfully staked ${amount} ALUMNI to become a Delegator/Validator! Tx Hash: ` + result.hash);
-            document.getElementById('tx-stake-amount').value = '';
-            fetchNetworkData();
-        }
-    } catch (err) {
-        console.error(err);
-        alert('Network error');
-    }
-});
 
 
 
@@ -1006,11 +999,10 @@ async function fetchLiveMarketPrices() {
     }, 5000);
 }
 
-// --- Mobile Mining Mock Logic ---
+// --- Mobile Mining Logic ---
 const btnStartMiner = document.getElementById('btn-start-miner');
 const minerStatus = document.getElementById('miner-status');
 const minerHashrate = document.getElementById('miner-hashrate');
-let miningInterval;
 
 if (btnStartMiner) {
     btnStartMiner.addEventListener('click', () => {
@@ -1021,7 +1013,7 @@ if (btnStartMiner) {
             btnStartMiner.classList.remove('primary');
             btnStartMiner.classList.add('secondary');
             
-            miningInterval = setInterval(() => {
+            window.miningInterval = setInterval(() => {
                 const hr = (Math.random() * (12.5 - 9.0) + 9.0).toFixed(1);
                 minerHashrate.textContent = `${hr} MH/s`;
             }, 2000);
@@ -1034,15 +1026,17 @@ if (btnStartMiner) {
             btnStartMiner.textContent = 'Start Mobile Mining';
             btnStartMiner.classList.remove('secondary');
             btnStartMiner.classList.add('primary');
-            clearInterval(miningInterval);
+            clearInterval(window.miningInterval);
         }
     });
 }
 
-// --- Swap Logic Mock ---
+// --- Swap Logic ---
 const btnSwapTokens = document.getElementById('btn-swap-tokens');
 if (btnSwapTokens) {
-    btnSwapTokens.addEventListener('click', () => {
+    btnSwapTokens.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!currentWallet) return alert("Please connect a wallet first.");
         const swapIn = document.getElementById('swap-amt-in');
         if (!swapIn || !swapIn.value || parseFloat(swapIn.value) <= 0) {
             return alert('Enter a valid amount to swap.');
@@ -1050,13 +1044,86 @@ if (btnSwapTokens) {
         
         btnSwapTokens.textContent = 'Swapping...';
         btnSwapTokens.disabled = true;
-        
-        setTimeout(() => {
+
+        try {
+            const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify({
+                    privateKey: currentWallet.privateKey,
+                    fromAddress: currentWallet.publicKey,
+                    toAddress: DEFI_ADDRESS,
+                    amount: 0,
+                    type: 'CONTRACT_CALL',
+                    payload: { method: 'swap', args: { symbolIn: 'ALUMNI', symbolOut: 'WETH', amountIn: parseFloat(swapIn.value) } }
+                })
+            });
+            const data = await res.json();
+            
+            if (data.error) {
+                alert("Swap Error: " + data.error);
+            } else {
+                alert(`Swap Executed! Tx Hash: ` + data.hash);
+                swapIn.value = '';
+                fetchNetworkData();
+            }
+        } catch (err) {
+            alert("Error executing swap: " + err.message);
+        } finally {
             btnSwapTokens.textContent = 'Swap Tokens';
             btnSwapTokens.disabled = false;
-            swapIn.value = '';
-            alert('Swap successful! View activity in your wallet.');
-        }, 1500);
+        }
+    });
+}
+
+// --- Stake Logic ---
+const btnStakeTx = document.getElementById('btn-stake-tx');
+if (btnStakeTx) {
+    btnStakeTx.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!currentWallet) return alert("Please connect a wallet first.");
+        const stakeIn = document.getElementById('stake-amt-in');
+        const amt = parseFloat(stakeIn.value);
+        if (!stakeIn || isNaN(amt) || amt < 50) {
+            return alert('Enter a valid amount to stake (minimum 50).');
+        }
+
+        btnStakeTx.textContent = 'Staking...';
+        btnStakeTx.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'
+                },
+                body: JSON.stringify({
+                    privateKey: currentWallet.privateKey,
+                    fromAddress: currentWallet.publicKey,
+                    toAddress: currentWallet.publicKey,
+                    amount: amt,
+                    type: 'STAKE'
+                })
+            });
+            const data = await res.json();
+            
+            if (data.error) {
+                alert("Staking Error: " + data.error);
+            } else {
+                alert(`Successfully Staked ${amt} ALUMNI! Tx Hash: ` + data.hash);
+                stakeIn.value = '';
+                fetchNetworkData();
+            }
+        } catch (err) {
+            alert("Error executing stake: " + err.message);
+        } finally {
+            btnStakeTx.textContent = 'Stake Tokens';
+            btnStakeTx.disabled = false;
+        }
     });
 }
 
