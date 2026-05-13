@@ -682,6 +682,12 @@ if (btnShowQr) {
         });
         qrContainer.style.display = 'inline-block';
         
+        const aliasText = document.getElementById('receive-alias-text');
+        if (aliasText) {
+            aliasText.textContent = tag ? tag : '';
+            aliasText.style.display = tag ? 'block' : 'none';
+        }
+        
         const addrText = document.getElementById('receive-address-text');
         if(addrText) {
           if (addrText) addrText.textContent = formatFullKey(currentWallet.publicKey);
@@ -796,7 +802,8 @@ async function renderMultiChainPortfolio(balance, cryptoSymbol, price) {
     const container = document.getElementById('multi-chain-portfolio');
     if (!container) return;
     
-    const usdValue = (balance * price).toFixed(2);
+    const usdValueRaw = balance * price;
+    const usdValue = usdValueRaw.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     let balanceStr = balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4});
     
     if (balanceField) balanceField.textContent = balanceStr;
