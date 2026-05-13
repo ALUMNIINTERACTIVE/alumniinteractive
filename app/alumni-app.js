@@ -455,7 +455,7 @@ function restorePemHeaders(input) {
 
 function formatFullKey(keyPem) {
     if (!keyPem) return 'Not Generated';
-    return keyPem.replace(/\n/g, '');
+    return keyPem;
 }
 
 function formatAlias(keyPem) {
