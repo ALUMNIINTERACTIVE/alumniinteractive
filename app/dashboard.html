@@ -15,7 +15,7 @@
     <script async src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <script async src="https://unpkg.com/html5-qrcode"></script>
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
     <div class="app-container">
@@ -86,24 +86,25 @@
             <section id="view-explorer" class="view active">
                 <header class="view-header">
                     <h2>Network Overview</h2>
-                    <div class="network-stats">
-                        <div class="stat-box glass-panel">
-                            <label>Latest Block</label>
-                            <span id="stat-block-height">0</span>
-                        </div>
-                        <div class="stat-box glass-panel">
-                            <label>Active Validators</label>
-                            <span id="stat-validators">0</span>
-                        </div>
-                        <div class="stat-box glass-panel">
-                            <label>Pending TXs</label>
-                            <span id="stat-pending">0</span>
-                        </div>
-                    </div>
                 </header>
 
-                <div class="dashboard-grid" style="margin-bottom: 24px;">
-                    <div class="card glass-panel span-2" style="padding-top: 24px;">
+                <div class="explorer-layout">
+                    <div class="explorer-left">
+                        <div class="network-stats">
+                            <div class="stat-box glass-panel">
+                                <label>Latest Block</label>
+                                <span id="stat-block-height">0</span>
+                            </div>
+                            <div class="stat-box glass-panel">
+                                <label>Active Validators</label>
+                                <span id="stat-validators">0</span>
+                            </div>
+                            <div class="stat-box glass-panel">
+                                <label>Pending TXs</label>
+                                <span id="stat-pending">0</span>
+                            </div>
+                        </div>
+                        <div class="card glass-panel" style="padding-top: 24px; margin-bottom: 24px;">
                         <svg width="0" height="0" style="position:absolute;"><defs><linearGradient id="grad-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.3"/><stop offset="100%" stop-color="transparent"/></linearGradient><linearGradient id="grad-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg>
                         
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -224,10 +225,12 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                        </div>
+                    </div>
+                    </div>
 
-                <div class="dashboard-grid">
-                    <div class="card glass-panel span-2">
+                    <div class="explorer-right">
+                    <div class="card glass-panel">
                         <h3>Live Ledger (Recent Blocks)</h3>
                         <div class="table-container">
                             <table id="blocks-table">
@@ -244,6 +247,7 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
                     </div>
                 </div>
             </section>
@@ -686,6 +690,6 @@
         </div>
     </div>
 
-    <script src="alumni-app.js?v=17"></script>
+    <script src="alumni-app.js?v=18"></script>
 </body>
 </html>

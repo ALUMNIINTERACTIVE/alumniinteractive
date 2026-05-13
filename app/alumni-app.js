@@ -680,7 +680,7 @@ const btnCopyAddress = document.getElementById('btn-copy-address');
 if (btnCopyAddress) {
     btnCopyAddress.addEventListener('click', () => {
         if (!currentWallet) return;
-        const pubKey = stripPemHeaders(currentWallet.publicKey);
+        const pubKey = currentWallet.publicKey;
         navigator.clipboard.writeText(pubKey).then(() => {
             const originalText = btnCopyAddress.textContent;
             btnCopyAddress.textContent = 'Copied!';
@@ -1014,25 +1014,12 @@ async function fetchLiveMarketPrices() {
     // Mock live fluctuations for Gold/Silver and Fallback Crypto prices
     let goldBase = 2450.10;
     let silverBase = 29.40;
-    let btcBase = 68200.00;
-    let ethBase = 3850.00;
-    let solBase = 165.20;
     setInterval(() => {
         const r1 = (Math.random() - 0.5) * 5; 
         const r2 = (Math.random() - 0.5) * 0.2; 
-        const rBtc = (Math.random() - 0.5) * 100;
-        const rEth = (Math.random() - 0.5) * 10;
-        const rSol = (Math.random() - 0.5) * 1;
         
-        btcBase += rBtc;
-        ethBase += rEth;
-        solBase += rSol;
-
         if(document.getElementById('price-xau')) document.getElementById('price-xau').textContent = '$' + (goldBase + r1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         if(document.getElementById('price-xag')) document.getElementById('price-xag').textContent = '$' + (silverBase + r2).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        if(document.getElementById('explore-price-btc')) document.getElementById('explore-price-btc').textContent = '$' + btcBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        if(document.getElementById('explore-price-eth')) document.getElementById('explore-price-eth').textContent = '$' + ethBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        if(document.getElementById('explore-price-sol')) document.getElementById('explore-price-sol').textContent = '$' + solBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }, 5000);
 }
 

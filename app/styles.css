@@ -275,6 +275,8 @@ body {
     display: flex;
     gap: 1.5rem;
     margin-top: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
 }
 
 .stat-box {
@@ -299,7 +301,28 @@ body {
     font-family: var(--font-mono);
 }
 
-/* Grid */
+/* Grid & Layout */
+.explorer-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+@media (min-width: 1024px) {
+    .explorer-layout {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    .explorer-left {
+        flex: 2;
+        min-width: 0;
+    }
+    .explorer-right {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
 .dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
