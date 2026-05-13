@@ -10,7 +10,7 @@ const DEFI_ADDRESS = 'f404c8f0e316ce023ee1723dc16fac8cef1aa09519f2d7e780adf5f90c
 
 // DOM Elements
 const views = document.querySelectorAll('.view');
-const navLinks = document.querySelectorAll('.nav-links li');
+const navLinks = document.querySelectorAll('.nav-links li, .bottom-nav-item');
 const statBlockHeight = document.getElementById('stat-block-height');
 const statValidators = document.getElementById('stat-validators');
 const statPending = document.getElementById('stat-pending');
@@ -107,8 +107,12 @@ if (walletSelector) {
             currentWallet = alumniWallets[idx];
             localStorage.setItem('alumni_active_wallet_idx', idx);
             // Refresh UI
-            pubKeyField.textContent = formatAlias(currentWallet.publicKey);
-            privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
+            if (pubKeyField) pubKeyField.textContent = formatAlias(currentWallet.publicKey);
+            if (privKeyField) privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
+            
+            const accountNameField = document.getElementById('wallet-account-name');
+            if (accountNameField) accountNameField.textContent = currentWallet.alias || `Account ${parseInt(idx) + 1}`;
+            
             fetchNetworkData();
         }
     });
@@ -116,6 +120,13 @@ if (walletSelector) {
     if (currentWallet) {
         if (pubKeyField) pubKeyField.textContent = formatAlias(currentWallet.publicKey);
         if (privKeyField) privKeyField.textContent = formatKeyDisplay(currentWallet.privateKey);
+        
+        const accountNameField = document.getElementById('wallet-account-name');
+        if (accountNameField) {
+            const idx = alumniWallets.findIndex(w => w.publicKey === currentWallet.publicKey);
+            accountNameField.textContent = currentWallet.alias || `Account ${idx + 1}`;
+        }
+        
         if (togglePrivKey) togglePrivKey.style.display = 'inline';
         const btnShowQr = document.getElementById('btn-show-qr');
         if (btnShowQr) btnShowQr.style.display = 'inline';
@@ -126,29 +137,40 @@ if (walletSelector) {
     }
 }
 
+
 // --- Navigation ---
+// Global tab switcher function
+window.switchTab = function(targetView) {
+    navLinks.forEach(l => {
+        if (l.getAttribute('data-view') === targetView) {
+            l.classList.add('active');
+        } else {
+            l.classList.remove('active');
+        }
+    });
+    
+    views.forEach(v => v.classList.remove('active'));
+    const targetElement = document.getElementById(`view-${targetView}`);
+    if (targetElement) {
+        targetElement.classList.add('active');
+    }
+    
+    // Save state
+    localStorage.setItem('alumni_active_view', targetView);
+};
+
 // Restore active view on load
 const savedView = localStorage.getItem('alumni_active_view');
 if (savedView) {
-    navLinks.forEach(l => l.classList.remove('active'));
-    views.forEach(v => v.classList.remove('active'));
-    const link = Array.from(navLinks).find(l => l.getAttribute('data-view') === savedView);
-    if (link) link.classList.add('active');
-    const view = document.getElementById(`view-${savedView}`);
-    if (view) view.classList.add('active');
+    window.switchTab(savedView);
+} else {
+    window.switchTab('wallet'); // Default to wallet (Home)
 }
 
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
-        navLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        
         const targetView = link.getAttribute('data-view');
-        views.forEach(v => v.classList.remove('active'));
-        document.getElementById(`view-${targetView}`).classList.add('active');
-        
-        // Save state
-        localStorage.setItem('alumni_active_view', targetView);
+        window.switchTab(targetView);
     });
 });
 
@@ -569,7 +591,20 @@ function updateWalletBalance(blocks) {
         });
     });
     
-    balanceField.textContent = balance.toFixed(2);
+    const balanceStr = balance.toFixed(2);
+    if (balanceField) balanceField.textContent = balanceStr;
+    
+    const smallBalanceField = document.getElementById('wallet-balance-small');
+    if (smallBalanceField) smallBalanceField.textContent = balanceStr;
+    
+    // Mock ALUMNI Price = $1.00 USD for visual effect
+    const usdValue = (balance * 1.00).toFixed(2);
+    
+    const mainUsdField = document.getElementById('wallet-balance-usd');
+    if (mainUsdField) mainUsdField.textContent = `$${usdValue}`;
+    
+    const smallUsdField = document.getElementById('wallet-balance-usd-small');
+    if (smallUsdField) smallUsdField.textContent = `$${usdValue}`;
 }
 
 btnSendTx.addEventListener('click', async () => {

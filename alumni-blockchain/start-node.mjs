@@ -26,7 +26,7 @@ const httpPort = process.env.HTTP_PORT || process.argv[2] || 3001;
 const p2pPort = process.env.P2P_PORT || 6001;
 
 // DNS Seeding: Default to the global Alumni network if no peers are specified
-const defaultSeeders = ['network.alumniinteractive.com:6001'];
+const defaultSeeders = []; // ['network.alumniinteractive.com:6001'];
 let initialPeers = process.env.PEERS ? process.env.PEERS.split(',') : defaultSeeders;
 if (process.env.PEERS === 'none') {
     initialPeers = [];
