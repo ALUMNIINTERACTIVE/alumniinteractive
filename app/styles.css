@@ -209,6 +209,7 @@ body {
     padding: 3rem 4rem;
     max-height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .action-btn {
