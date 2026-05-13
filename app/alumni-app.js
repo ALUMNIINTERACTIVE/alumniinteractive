@@ -284,7 +284,17 @@ async function fetchNetworkData() {
         }
 
     } catch (err) {
-        document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator" style="background: #ef4444; box-shadow: 0 0 8px #ef4444;"></div>Node Offline<br><span style="font-size:0.7rem;opacity:0.6">Check Windows PC</span>`;
+        document.querySelectorAll('.status-indicator').forEach(el => {
+            el.style.background = '#ef4444';
+            el.style.boxShadow = '0 0 8px #ef4444';
+        });
+        const desktopStatus = document.querySelector('.node-status span');
+        if (desktopStatus) desktopStatus.textContent = 'Node Offline';
+        const desktopSub = document.getElementById('node-url');
+        if (desktopSub) desktopSub.textContent = 'Check Windows PC';
+        const mobileStatus = document.querySelector('.mobile-status-text');
+        if (mobileStatus) mobileStatus.textContent = 'Offline';
+        
         if (currentWallet) {
             const cleanPub = currentWallet.publicKey.replace(/\s+/g, '');
             const satoshiKey = "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAENwPfFbba+A9l6uFutbQucAOUgPQNujNn\nTl+oXgr5F0U+SPynvHJbC07kXms5iYwEAtqT1D3ErWnPX+a6XE7NtQ==\n-----END PUBLIC KEY-----\n".replace(/\s+/g, '');
@@ -352,7 +362,16 @@ async function updateCustomTokens() {
 }
 
 function updateDashboard(blocks, pending, validators) {
-    document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></div>Node Connected<br><span style="font-size:0.7rem;opacity:0.6">Alumni Blockchain</span>`;
+        document.querySelectorAll('.status-indicator').forEach(el => {
+            el.style.background = '#10b981';
+            el.style.boxShadow = '0 0 8px #10b981';
+        });
+        const desktopStatus = document.querySelector('.node-status span');
+        if (desktopStatus) desktopStatus.textContent = 'Node Connected';
+        const desktopSub = document.getElementById('node-url');
+        if (desktopSub) desktopSub.textContent = 'Alumni Blockchain';
+        const mobileStatus = document.querySelector('.mobile-status-text');
+        if (mobileStatus) mobileStatus.textContent = 'Connected';
     
     statBlockHeight.textContent = blocks.length;
     statPending.textContent = pending.length;
@@ -992,7 +1011,16 @@ async function initDashboard() {
             if (res.ok) {
                 API_URL = endpoint;
                 console.log('Connected to Node:', API_URL);
-                document.querySelector('.status-indicator').parentElement.innerHTML = `<div class="status-indicator"></div>Node Connected<br><span style="font-size:0.7rem;opacity:0.6">Alumni Blockchain</span>`;
+                document.querySelectorAll('.status-indicator').forEach(el => {
+                    el.style.background = '#10b981';
+                    el.style.boxShadow = '0 0 8px #10b981';
+                });
+                const desktopStatus = document.querySelector('.node-status span');
+                if (desktopStatus) desktopStatus.textContent = 'Node Connected';
+                const desktopSub = document.getElementById('node-url');
+                if (desktopSub) desktopSub.textContent = 'Alumni Blockchain';
+                const mobileStatus = document.querySelector('.mobile-status-text');
+                if (mobileStatus) mobileStatus.textContent = 'Connected';
                 break;
             }
         } catch (e) {
