@@ -449,7 +449,6 @@ togglePrivKey.addEventListener('click', () => {
 });
 }
 
-const btnDisconnectWallet = document.getElementById('btn-disconnect-wallet');
 function disconnectWallet() {
     localStorage.removeItem('alumni_active_wallet_idx');
     currentWallet = null;
