@@ -432,7 +432,7 @@ function updateDashboard(blocks, pending, validators) {
 
 function formatKeyDisplay(keyPem) {
     if (!keyPem) return 'Not Generated';
-    return keyPem.replace(/-----BEGIN[^-]*-----/g, '').replace(/-----END[^-]*-----/g, '').replace(/\s+/g, '');
+    return keyPem;
 }
 
 function stripPemHeaders(keyPem) {

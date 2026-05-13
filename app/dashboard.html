@@ -349,10 +349,7 @@
                             <span id="wallet-pub" style="word-break: break-all; white-space: pre-wrap; font-size: 11px;">Not Generated</span>
                             <span id="btn-share-pub" style="color: var(--accent); cursor: pointer; padding-left: 10px;">Copy</span>
                         </div>
-                        <div class="input-field secret" style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: none;">
-                            <span id="wallet-priv" style="filter: blur(5px); overflow: hidden; text-overflow: ellipsis;">Not Generated</span>
-                            <span id="toggle-priv-key" style="color: var(--accent); cursor: pointer; padding-left: 10px;">Show</span>
-                        </div>
+
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <button id="btn-generate-wallet" class="btn primary glow" style="width: 100%;">Create New Wallet</button>
@@ -375,7 +372,7 @@
                     
                     <!-- Hidden elements needed for logic -->
                     <select id="wallet-selector" style="display: none;"></select>
-                    <span id="btn-edit-tag" style="display: none;"></span>
+
                 </div>
 
                 <!-- Send Modal -->
@@ -440,6 +437,15 @@
 
                         <!-- Manage Section -->
                         <div class="settings-section-title">Manage</div>
+                        <div class="settings-list-item" id="btn-edit-tag" style="cursor: pointer;">
+                            <span>✏️ Edit @ALUMNI Tag</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                        <div style="margin-bottom: 12px; font-size: 0.85rem; color: var(--text-muted); margin-top: 20px;">Secret Private Key:</div>
+                        <div class="input-field secret" style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: none; margin-bottom: 20px;">
+                            <span id="wallet-priv" style="filter: blur(5px); word-break: break-all; white-space: pre-wrap; font-size: 11px;">Not Generated</span>
+                            <span id="toggle-priv-key" style="color: var(--accent); cursor: pointer; padding-left: 10px;">Show</span>
+                        </div>
                         <div class="settings-list-item">
                             <span>⚙️ Settings</span>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
