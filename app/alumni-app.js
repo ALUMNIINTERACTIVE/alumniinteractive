@@ -281,6 +281,23 @@ async function fetchNetworkData() {
                 document.getElementById('btn-edit-tag').style.display = 'inline';
                 document.getElementById('btn-share-pub').style.display = 'inline';
             }
+            
+            // Check Validator Stake for Mobile Validation
+            const minerBtn = document.getElementById('btn-start-miner');
+            if (minerBtn && !window.miningInterval) {
+                const myStake = validators[currentWallet.publicKey] || 0;
+                if (myStake >= 50) {
+                    minerBtn.disabled = false;
+                    minerBtn.textContent = 'Start Mobile Validation';
+                    minerBtn.classList.remove('secondary');
+                    minerBtn.classList.add('primary');
+                } else {
+                    minerBtn.disabled = true;
+                    minerBtn.textContent = 'Requires 50 ALUMNI Stake';
+                    minerBtn.classList.remove('primary');
+                    minerBtn.classList.add('secondary');
+                }
+            }
         }
 
     } catch (err) {
@@ -1059,30 +1076,66 @@ async function fetchLiveMarketPrices() {
 const btnStartMiner = document.getElementById('btn-start-miner');
 const minerStatus = document.getElementById('miner-status');
 const minerHashrate = document.getElementById('miner-hashrate');
+let blocksProposed = 0;
 
 if (btnStartMiner) {
     btnStartMiner.addEventListener('click', () => {
-        if (minerStatus.textContent === 'Standby') {
-            minerStatus.textContent = 'Mining Active';
+        if (!currentWallet) return alert("Please connect a wallet first.");
+        
+        if (!window.miningInterval) {
+            minerStatus.textContent = 'Awaiting Network Slot...';
             minerStatus.style.color = '#10b981';
-            btnStartMiner.textContent = 'Stop Mining';
+            btnStartMiner.textContent = 'Stop Validation';
             btnStartMiner.classList.remove('primary');
             btnStartMiner.classList.add('secondary');
             
-            window.miningInterval = setInterval(() => {
-                const hr = (Math.random() * (12.5 - 9.0) + 9.0).toFixed(1);
-                minerHashrate.textContent = `${hr} MH/s`;
-            }, 2000);
+            // Ping the backend every 15 seconds to propose blocks
+            window.miningInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`${API_URL}/mobile-propose`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'ngrok-skip-browser-warning': 'true'
+                        },
+                        body: JSON.stringify({
+                            privateKey: restorePrivatePemHeaders(currentWallet.privateKey),
+                            publicKey: restorePemHeaders(currentWallet.publicKey)
+                        })
+                    });
+                    
+                    const result = await res.json();
+                    if (!result.error) {
+                        blocksProposed++;
+                        minerHashrate.textContent = blocksProposed.toString();
+                        minerStatus.textContent = 'Block Proposed!';
+                        setTimeout(() => { if(window.miningInterval) minerStatus.textContent = 'Awaiting Network Slot...'; }, 3000);
+                        fetchNetworkData(); // Refresh UI to show new balance
+                    } else {
+                        // Error (e.g. not enough stake, or no transactions to mine)
+                        if (result.error.includes('stake')) {
+                            minerStatus.textContent = 'Stake Error';
+                            minerStatus.style.color = '#ef4444';
+                            clearInterval(window.miningInterval);
+                            window.miningInterval = null;
+                            btnStartMiner.textContent = 'Requires 50 ALUMNI Stake';
+                            btnStartMiner.disabled = true;
+                        }
+                    }
+                } catch(err) {
+                    console.log("Validation ping failed", err);
+                }
+            }, 15000); // 15 seconds
             
-            alert('Mobile mining started. Rewards accrue automatically in the background.');
+            alert('Mobile Validation started! Keep this app open to dynamically propose blocks and earn 5 ALUMNI per block.');
         } else {
             minerStatus.textContent = 'Standby';
             minerStatus.style.color = '#9e9ea7';
-            minerHashrate.textContent = '0.0 H/s';
             btnStartMiner.textContent = 'Start Mobile Mining';
             btnStartMiner.classList.remove('secondary');
             btnStartMiner.classList.add('primary');
             clearInterval(window.miningInterval);
+            window.miningInterval = null;
         }
     });
 }

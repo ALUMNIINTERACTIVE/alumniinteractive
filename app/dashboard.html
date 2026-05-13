@@ -548,19 +548,19 @@
                 
                 <div class="dashboard-grid">
                     <div class="card glass-panel" style="border: 1px solid var(--accent);">
-                        <h3 style="color: var(--accent); margin-bottom: 8px;">Mobile Mining (Lite Node)</h3>
-                        <p style="font-size: 0.85rem; margin-bottom: 16px;">Keep this app open to simulate mining via WebWorker. Mobile miners receive a micro-reward of <strong>0.05 ALUMNI</strong> per block found, supporting network decentralization without draining your battery.</p>
+                        <h3 style="color: var(--accent); margin-bottom: 8px;">Mobile Validator Node</h3>
+                        <p style="font-size: 0.85rem; margin-bottom: 16px;">Keep this app open to propose blocks dynamically to the network via your <strong>Stake</strong>. Mobile validators earn the standard network reward of <strong>5 ALUMNI</strong> plus fees per block proposed!</p>
                         <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                                 <span style="font-size: 0.8rem; color: var(--text-muted);">Status</span>
-                                <span id="miner-status" style="font-size: 0.8rem; color: var(--success); font-weight: 600;">Standby</span>
+                                <span id="miner-status" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Checking Stake...</span>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="font-size: 0.8rem; color: var(--text-muted);">Hashrate</span>
-                                <span id="miner-hashrate" style="font-size: 0.8rem; font-family: monospace;">0.0 H/s</span>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Total Blocks Proposed</span>
+                                <span id="miner-hashrate" style="font-size: 0.8rem; font-family: monospace;">0</span>
                             </div>
                         </div>
-                        <button id="btn-start-miner" class="btn primary full-width glow">Start Mobile Mining</button>
+                        <button id="btn-start-miner" class="btn secondary full-width glow" disabled>Requires 50 ALUMNI Stake</button>
                     </div>
 
                     <div class="card glass-panel">

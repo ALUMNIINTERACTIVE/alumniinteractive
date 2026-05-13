@@ -148,6 +148,28 @@ export class HttpApi {
           }
         });
       }
+      else if (req.method === 'POST' && req.url === '/mobile-propose') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', async () => {
+          try {
+            const { privateKey, publicKey } = JSON.parse(body);
+            const { Wallet } = await import('./Wallet.mjs');
+            const tempWallet = new Wallet();
+            tempWallet.publicKey = publicKey;
+            tempWallet.privateKey = privateKey;
+            
+            const newBlock = this.blockchain.proposeBlock(tempWallet);
+            this.p2pNode.broadcastLatest(); // Gossip the new block
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Mobile Validation Successful', block: newBlock }));
+          } catch(e) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: e.message }));
+          }
+        });
+      }
       else {
         res.writeHead(404);
         res.end('Not Found');
