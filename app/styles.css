@@ -510,7 +510,7 @@ td {
         display: flex;
     }
     .content-area {
-        padding: 1.5rem 1rem;
+        padding: 0.5rem 1rem;
         padding-bottom: 90px; /* Space for bottom nav */
     }
     .dashboard-grid {
