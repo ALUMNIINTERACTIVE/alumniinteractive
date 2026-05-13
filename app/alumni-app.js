@@ -453,6 +453,18 @@ function restorePemHeaders(input) {
     return `-----BEGIN PUBLIC KEY-----\n${formatted}\n-----END PUBLIC KEY-----\n`;
 }
 
+function restorePrivatePemHeaders(input) {
+    if (!input) return input;
+    let rawBase64 = input.replace(/-----BEGIN PRIVATE KEY-----/g, '')
+                         .replace(/-----END PRIVATE KEY-----/g, '')
+                         .replace(/\s+/g, '');
+                         
+    if (rawBase64.length === 0) return input;
+    
+    const formatted = rawBase64.match(/.{1,64}/g).join('\n');
+    return `-----BEGIN PRIVATE KEY-----\n${formatted}\n-----END PRIVATE KEY-----\n`;
+}
+
 function formatFullKey(keyPem) {
     if (!keyPem) return 'Not Generated';
     return keyPem;
@@ -900,8 +912,8 @@ btnSendTx.addEventListener('click', async () => {
                 'ngrok-skip-browser-warning': 'true'
             },
             body: JSON.stringify({
-                privateKey: currentWallet.privateKey,
-                fromAddress: currentWallet.publicKey,
+                privateKey: restorePrivatePemHeaders(currentWallet.privateKey),
+                fromAddress: restorePemHeaders(currentWallet.publicKey),
                 toAddress: toAddress,
                 amount: amount,
                 type: 'TRANSFER'
@@ -1111,8 +1123,8 @@ if (btnSwapTokens) {
                     'ngrok-skip-browser-warning': 'true'
                 },
                 body: JSON.stringify({
-                    privateKey: currentWallet.privateKey,
-                    fromAddress: currentWallet.publicKey,
+                    privateKey: restorePrivatePemHeaders(currentWallet.privateKey),
+                    fromAddress: restorePemHeaders(currentWallet.publicKey),
                     toAddress: DEFI_ADDRESS,
                     amount: 0,
                     type: 'CONTRACT_CALL',
@@ -1160,9 +1172,9 @@ if (btnStakeTx) {
                     'ngrok-skip-browser-warning': 'true'
                 },
                 body: JSON.stringify({
-                    privateKey: currentWallet.privateKey,
-                    fromAddress: currentWallet.publicKey,
-                    toAddress: currentWallet.publicKey,
+                    privateKey: restorePrivatePemHeaders(currentWallet.privateKey),
+                    fromAddress: restorePemHeaders(currentWallet.publicKey),
+                    toAddress: restorePemHeaders(currentWallet.publicKey),
                     amount: amt,
                     type: 'STAKE'
                 })
