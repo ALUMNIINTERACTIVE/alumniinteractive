@@ -103,38 +103,124 @@
                 </header>
 
                 <div class="dashboard-grid" style="margin-bottom: 24px;">
-                    <div class="card glass-panel span-2">
-                        <h3>Global Markets</h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; padding-bottom: 8px;">
-                            <div style="min-width: 120px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Gold (XAU)</div>
-                                <div id="price-xau" style="font-size: 1.2rem; font-weight: 600;">$2,450.10</div>
-                                <div id="change-xau" style="color: #10b981; font-size: 0.8rem;">+1.2%</div>
+                    <div class="card glass-panel span-2" style="padding-top: 24px;">
+                        <svg width="0" height="0" style="position:absolute;"><defs><linearGradient id="grad-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.3"/><stop offset="100%" stop-color="transparent"/></linearGradient><linearGradient id="grad-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3>Trending</h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                        <h4 style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem;">Top traded (24h)</h4>
+                        
+                        <div class="hide-scrollbar" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 16px;">
+                            <!-- ETH -->
+                            <div style="min-width: 140px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">Ethereum</span>
+                                    <div style="width: 20px; height: 20px; background: #627eea; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/></svg></div>
+                                </div>
+                                <div id="explore-price-eth" style="font-size: 1.2rem; font-weight: 600;">$3,850.00</div>
+                                <div id="explore-change-eth" style="color: #ef4444; font-size: 0.8rem;">-0.79%</div>
+                                <svg style="width: 100%; height: 40px; margin-top: 10px;" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M0 20 Q 10 10, 20 25 T 40 15 T 60 30 T 80 20 T 100 25" fill="none" stroke="#ef4444" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="M0 20 Q 10 10, 20 25 T 40 15 T 60 30 T 80 20 T 100 25 L 100 40 L 0 40 Z" fill="url(#grad-red)"/></svg>
                             </div>
-                            <div style="min-width: 120px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Silver (XAG)</div>
-                                <div id="price-xag" style="font-size: 1.2rem; font-weight: 600;">$29.40</div>
-                                <div id="change-xag" style="color: #10b981; font-size: 0.8rem;">+0.8%</div>
+                            <!-- BTC -->
+                            <div style="min-width: 140px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">Bitcoin</span>
+                                    <div style="width: 20px; height: 20px; background: #f7931a; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M17.447 11.168c1.036-.576 1.636-1.63 1.488-3.076-.236-2.316-2.186-2.73-4.708-2.825V2h-1.92v3.17c-.452.015-.923.037-1.402.063V2H8.986v3.315c-.476.035-.953.074-1.42.112v-.004L5 5.568v1.656h1.597c.567.065.877.294 1.01.696l1.83 8.892c-.085.39-.333.633-.943.72l-1.527.172V19.4l2.585-.295c.46-.048.92-.093 1.39-.136V22h1.92v-3.09c.477-.04.945-.078 1.413-.11v3.085h1.92v-3.21c2.812-.24 5.097-1.127 5.438-3.957.25-2.096-.826-3.136-2.686-3.45zM12.44 7.64c1.385-.152 3.018.064 3.14 1.25.12 1.144-1.39 1.48-2.816 1.636L12.44 7.64zm.82 8.35c-1.64.175-3.6.012-3.73-1.28-.13-1.306 1.64-1.68 3.32-1.856l.41 3.137z"/></svg></div>
+                                </div>
+                                <div id="explore-price-btc" style="font-size: 1.2rem; font-weight: 600;">$68,200.00</div>
+                                <div id="explore-change-btc" style="color: #10b981; font-size: 0.8rem;">+2.42%</div>
+                                <svg style="width: 100%; height: 40px; margin-top: 10px;" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M0 30 Q 10 35, 20 20 T 40 25 T 60 10 T 80 15 T 100 5" fill="none" stroke="#10b981" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="M0 30 Q 10 35, 20 20 T 40 25 T 60 10 T 80 15 T 100 5 L 100 40 L 0 40 Z" fill="url(#grad-green)"/></svg>
                             </div>
-                            <div style="min-width: 120px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Bitcoin (BTC)</div>
-                                <div id="price-btc" style="font-size: 1.2rem; font-weight: 600;">$68,200</div>
-                                <div id="change-btc" style="color: #ef4444; font-size: 0.8rem;">-0.5%</div>
+                            <!-- SOL -->
+                            <div style="min-width: 140px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">Solana</span>
+                                    <div style="width: 20px; height: 20px; background: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="#14F195"><path d="M4 17.333h12.585l2.603-4H6.603L4 17.333zm16-6.666H7.415l-2.603 4H17.397l2.603-4zM4 6.667h12.585l2.603-4H6.603L4 6.667z"/></svg></div>
+                                </div>
+                                <div id="explore-price-sol" style="font-size: 1.2rem; font-weight: 600;">$165.20</div>
+                                <div id="explore-change-sol" style="color: #ef4444; font-size: 0.8rem;">-1.13%</div>
+                                <svg style="width: 100%; height: 40px; margin-top: 10px;" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M0 10 Q 10 20, 20 15 T 40 30 T 60 25 T 80 35 T 100 20" fill="none" stroke="#ef4444" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="M0 10 Q 10 20, 20 15 T 40 30 T 60 25 T 80 35 T 100 20 L 100 40 L 0 40 Z" fill="url(#grad-red)"/></svg>
                             </div>
-                            <div style="min-width: 120px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Ethereum (ETH)</div>
-                                <div id="price-eth" style="font-size: 1.2rem; font-weight: 600;">$3,850</div>
-                                <div id="change-eth" style="color: #10b981; font-size: 0.8rem;">+2.1%</div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="hide-scrollbar" style="display: flex; gap: 8px; margin: 20px 0; overflow-x: auto;">
+                            <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer;">⭐</div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; border: 1px solid var(--accent); color: var(--accent);">Hot tokens</div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer;">Top Gainers</div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer;">RWA</div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer;">Meme</div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; cursor: pointer;">DeFi</div>
+                        </div>
+
+                        <!-- Markets List -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; cursor: pointer;">Network ▾</div>
+                            <div style="display: flex; gap: 8px;">
+                                <div style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; cursor: pointer;">Market cap ↓</div>
+                                <div style="background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; cursor: pointer;">24h ▾</div>
                             </div>
-                            <div style="min-width: 120px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Solana (SOL)</div>
-                                <div id="price-sol" style="font-size: 1.2rem; font-weight: 600;">$165.20</div>
-                                <div id="change-sol" style="color: #10b981; font-size: 0.8rem;">+5.4%</div>
+                        </div>
+
+                        <!-- Market Rows -->
+                        <div style="display: flex; flex-direction: column;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 36px; height: 36px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24"><path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10zm-3.236-4.665l-2.072 2.071 2.072 2.072-1.414 1.414-2.072-2.072-2.071 2.072-1.415-1.414 2.072-2.072-2.072-2.071 1.415-1.414 2.071 2.071 2.072-2.071 1.414 1.414z" fill="#000"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">XRP</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">$89.56B MCap • $2.24B Vol</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; display: flex; align-items: center; gap: 16px;">
+                                    <svg style="width: 60px; height: 24px; display: none;" class="desktop-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M0 20 Q 10 10, 20 25 T 40 15 T 60 30 T 80 20 T 100 25" fill="none" stroke="#ef4444" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">$1.45</div>
+                                        <div style="color: #ef4444; font-size: 0.8rem; text-align: right;">-1.05%</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div style="min-width: 120px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Toncoin (TON)</div>
-                                <div id="price-ton" style="font-size: 1.2rem; font-weight: 600;">$6.80</div>
-                                <div id="change-ton" style="color: #ef4444; font-size: 0.8rem;">-1.2%</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 36px; height: 36px; background: #2775ca; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; color: white; font-weight: bold;">
+                                        Z
+                                        <div style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #f7931a; border-radius: 50%; border: 2px solid var(--panel-bg);"></div>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">ZEC</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">$9.67B MCap • $823.4M Vol</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; display: flex; align-items: center; gap: 16px;">
+                                    <svg style="width: 60px; height: 24px; display: none;" class="desktop-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M0 30 Q 10 35, 20 20 T 40 25 T 60 10 T 80 15 T 100 5" fill="none" stroke="#10b981" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">$579.97</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; text-align: right;">+5.53%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Mock TON -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 36px; height: 36px; background: #0098ea; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.184 8.705l-3.328 6.577a.933.933 0 0 1-1.712 0l-3.328-6.577a1.05 1.05 0 0 1 .494-1.428 1.135 1.135 0 0 1 1.341.22l2.35 2.457 2.348-2.457a1.135 1.135 0 0 1 1.341-.22 1.05 1.05 0 0 1 .494 1.428z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">TON</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">$8.56B MCap • $200.2M Vol</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; display: flex; align-items: center; gap: 16px;">
+                                    <svg style="width: 60px; height: 24px; display: none;" class="desktop-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M0 20 Q 10 10, 20 25 T 40 15 T 60 30 T 80 20 T 100 25" fill="none" stroke="#ef4444" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;" id="explore-price-ton">$6.80</div>
+                                        <div style="color: #ef4444; font-size: 0.8rem; text-align: right;" id="explore-change-ton">-1.20%</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -217,32 +303,33 @@
                 </div>
 
                 <!-- Tokens List -->
-                <div class="section-title" style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-weight: 600; font-size: 1.1rem;">
-                    Tokens <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <!-- Portfolio Tabs -->
+                <div style="display: flex; gap: 24px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; font-weight: 600;">
+                    <div style="color: var(--text-main); border-bottom: 2px solid var(--accent); padding-bottom: 12px; margin-bottom: -13px; cursor: pointer;">Crypto</div>
+                    <div style="color: var(--text-muted); cursor: pointer;">Watchlist</div>
+                    <div style="color: var(--text-muted); cursor: pointer;">NFTs</div>
+                    <div style="margin-left: auto; color: var(--text-muted); cursor: pointer;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    </div>
                 </div>
                 
-                <div class="token-list">
-                    <!-- Native ALUMNI Token -->
+                <div class="token-list" id="multi-chain-portfolio">
+                    <!-- Populated by JavaScript based on imported network -->
                     <div class="token-list-item" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color); cursor: pointer;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">A</div>
                             <div>
-                                <div style="font-weight: 600; font-size: 1rem;">ALUMNI</div>
+                                <div style="font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 8px;">ALUMNI <span style="font-size: 0.65rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 8px; font-weight: 500;">Native</span></div>
                                 <div style="font-size: 0.8rem; color: var(--text-muted);">$1.00 • <span style="color: var(--danger);">-0.00%</span></div>
                             </div>
                         </div>
                         <div style="text-align: right;">
                             <div style="font-weight: 600; font-size: 1rem;" id="wallet-balance-usd-small">$0.00</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);"><span id="wallet-balance-small">0.00</span> ALUMNI</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);"><span id="wallet-balance-small">0.00</span></div>
                         </div>
                     </div>
-                    
-                    <!-- Container for custom ALC-20 tokens -->
-                    <div id="token-portfolio-container">
-                        <div id="token-list">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
+                    <div id="token-list"></div>
+                </div>
                 </div>
 
                 <!-- Wallet Action Modals (Hidden by default) -->
@@ -273,9 +360,16 @@
                     </div>
 
                     <div id="import-wallet-form" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                        <textarea id="import-priv-input" placeholder="Paste Private Key (PEM)" class="input-field" style="min-height: 60px;"></textarea>
-                        <textarea id="import-pub-input" placeholder="Paste Public Key (PEM)" class="input-field" style="min-height: 60px;"></textarea>
-                        <button id="btn-submit-import" class="btn primary full-width">Confirm Import</button>
+                        <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; display: block;">Select Network</label>
+                        <select id="import-network-select" class="input-field" style="margin-bottom: 16px;">
+                            <option value="alumni">Alumni Native (PEM Keys)</option>
+                            <option value="ethereum">Ethereum / Base / ERC-20 (0x...)</option>
+                            <option value="solana">Solana (Base58)</option>
+                            <option value="bitcoin">Bitcoin (BTC Address)</option>
+                        </select>
+                        <textarea id="import-priv-input" placeholder="Paste Private Key (PEM format for Alumni)" class="input-field" style="min-height: 60px;"></textarea>
+                        <textarea id="import-pub-input" placeholder="Paste Public Address or PEM Key" class="input-field" style="min-height: 60px;"></textarea>
+                        <button id="btn-submit-import" class="btn primary full-width">Connect Wallet</button>
                     </div>
                     
                     <!-- Hidden elements needed for logic -->
@@ -418,13 +512,12 @@
 
                     <div class="card glass-panel">
                         <h3>Full Node Validator</h3>
-                        <p style="font-size: 0.85rem; margin-bottom: 12px;">Earn full block rewards (1 ALUMNI) by running a Desktop Node.</p>
-                        <ol style="font-size: 0.8rem; margin-left: 20px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;">
-                            <li>Download the Desktop Client from the official repository.</li>
-                            <li>Stake at least 50 ALUMNI using the Web Wallet.</li>
-                            <li>Run <code>node start-node.mjs</code> on your machine.</li>
-                            <li>Keep port 6001 open to accept incoming connections.</li>
-                        </ol>
+                        <p style="font-size: 0.85rem; margin-bottom: 12px;">Run a Node in 30 Seconds via Terminal.</p>
+                        <div style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 8px;">
+                            <div>$ git clone https://github.com/ALUMNIINTERACTIVE/alumniinteractive.git</div>
+                            <div>$ cd alumni-blockchain</div>
+                            <div>$ node start-node.mjs</div>
+                        </div>
                     </div>
                 </div>
             </section>

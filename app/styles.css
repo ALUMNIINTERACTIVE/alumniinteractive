@@ -521,6 +521,14 @@ td {
     margin-bottom: 10px;
 }
 
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 @media (min-width: 769px) {
     .sidebar {
         display: flex;
@@ -530,6 +538,9 @@ td {
     }
     .content-area {
         padding: 3rem 4rem;
+    }
+    .desktop-sparkline {
+        display: block !important;
     }
 }
 
