@@ -134,6 +134,11 @@ if (walletSelector) {
         if (btnSharePub) btnSharePub.style.display = 'inline';
         const btnEditTag = document.getElementById('btn-edit-tag');
         if (btnEditTag) btnEditTag.style.display = 'inline';
+    } else {
+        // No wallet exists, wait for modals to init, then open account modal
+        setTimeout(() => {
+            if(typeof openModal === 'function') openModal('modal-account');
+        }, 100);
     }
 }
 
@@ -173,6 +178,52 @@ navLinks.forEach(link => {
         window.switchTab(targetView);
     });
 });
+
+// --- Modal Logic ---
+const modalOverlay = document.getElementById('modal-overlay');
+const modals = document.querySelectorAll('[id^="modal-"]');
+const closeModals = document.querySelectorAll('.close-modal');
+
+function openModal(modalId) {
+    if(modalOverlay) modalOverlay.style.display = 'block';
+    const m = document.getElementById(modalId);
+    if(m) {
+        m.style.display = 'block';
+        m.style.animation = 'slideUp 0.3s ease-out forwards';
+    }
+}
+
+function closeModalAll() {
+    if(modalOverlay) modalOverlay.style.display = 'none';
+    modals.forEach(m => {
+        if(m.id !== 'modal-overlay') {
+            m.style.display = 'none';
+        }
+    });
+}
+
+if(modalOverlay) modalOverlay.addEventListener('click', closeModalAll);
+closeModals.forEach(btn => btn.addEventListener('click', closeModalAll));
+
+// Hook up action buttons
+const btnActionBuy = document.getElementById('btn-action-buy');
+const btnActionSwap = document.getElementById('btn-action-swap');
+const btnActionSend = document.getElementById('btn-action-send');
+const btnActionReceive = document.getElementById('btn-action-receive');
+const walletAccountName = document.getElementById('wallet-account-name');
+
+if(btnActionSend) btnActionSend.addEventListener('click', () => openModal('modal-send'));
+if(btnActionReceive) {
+    btnActionReceive.addEventListener('click', () => {
+        openModal('modal-receive');
+        const showQrBtn = document.getElementById('btn-show-qr');
+        if(showQrBtn) showQrBtn.click(); // Generate QR
+    });
+}
+if(btnActionSwap) btnActionSwap.addEventListener('click', () => window.switchTab('dex'));
+if(btnActionBuy) btnActionBuy.addEventListener('click', () => alert('Fiat on-ramp coming soon!'));
+if(walletAccountName) walletAccountName.addEventListener('click', () => openModal('modal-account'));
+
 
 // --- Explorer Logic ---
 async function fetchNetworkData() {
@@ -399,8 +450,7 @@ togglePrivKey.addEventListener('click', () => {
 }
 
 const btnDisconnectWallet = document.getElementById('btn-disconnect-wallet');
-if (btnDisconnectWallet) {
-btnDisconnectWallet.addEventListener('click', () => {
+function disconnectWallet() {
     localStorage.removeItem('alumni_active_wallet_idx');
     currentWallet = null;
     localStorage.removeItem('alumni_wallets');
@@ -416,11 +466,50 @@ btnDisconnectWallet.addEventListener('click', () => {
     document.getElementById('btn-show-qr').style.display = 'none';
     document.getElementById('btn-share-pub').style.display = 'none';
     document.getElementById('btn-edit-tag').style.display = 'none';
-    document.getElementById('qr-display-container').style.display = 'none';
-    balanceField.textContent = '0.00';
-    customTokensContainer.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>';
-});
+    const qrDisplay = document.getElementById('qr-display-container');
+    if(qrDisplay) qrDisplay.style.display = 'none';
+    
+    // Clear new mobile UI fields
+    const accountNameField = document.getElementById('wallet-account-name');
+    if (accountNameField) accountNameField.textContent = 'Account 1';
+    
+    if (balanceField) balanceField.textContent = '0.00';
+    const smallBalanceField = document.getElementById('wallet-balance-small');
+    if (smallBalanceField) smallBalanceField.textContent = '0.00';
+    const mainUsdField = document.getElementById('wallet-balance-usd');
+    if (mainUsdField) mainUsdField.textContent = '$0.00';
+    const smallUsdField = document.getElementById('wallet-balance-usd-small');
+    if (smallUsdField) smallUsdField.textContent = '$0.00';
+
+    if(customTokensContainer) customTokensContainer.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>';
+    
+    closeModalAll();
+    alert('Wallet disconnected.');
 }
+
+const btnDisconnectWallet = document.getElementById('btn-disconnect-wallet');
+if (btnDisconnectWallet) {
+    btnDisconnectWallet.addEventListener('click', disconnectWallet);
+}
+
+// Hook up Settings Menu
+const btnOpenSettings = document.getElementById('btn-open-settings');
+if(btnOpenSettings) btnOpenSettings.addEventListener('click', () => openModal('modal-settings'));
+
+const btnSettingsBuy = document.getElementById('btn-settings-buy');
+if(btnSettingsBuy) btnSettingsBuy.addEventListener('click', () => { closeModalAll(); alert('Fiat on-ramp coming soon!'); });
+
+const btnSettingsScan = document.getElementById('btn-settings-scan');
+if(btnSettingsScan) btnSettingsScan.addEventListener('click', () => {
+    closeModalAll();
+    const target = document.getElementById('btn-scan-qr');
+    if(target) target.click();
+    else alert('QR Scanner coming soon!');
+});
+
+const btnSettingsLogout = document.getElementById('btn-settings-logout');
+if(btnSettingsLogout) btnSettingsLogout.addEventListener('click', disconnectWallet);
+
 
 // --- Wallet Logic ---
 btnGenerate.addEventListener('click', async () => {
@@ -437,11 +526,16 @@ btnGenerate.addEventListener('click', async () => {
         
         pubKeyField.textContent = formatAlias(data.publicKey);
         privKeyField.textContent = formatKeyDisplay(data.privateKey);
+        
+        const accountNameField = document.getElementById('wallet-account-name');
+        if (accountNameField) accountNameField.textContent = currentWallet.alias;
+        
         togglePrivKey.style.display = 'inline';
         document.getElementById('btn-show-qr').style.display = 'inline';
         document.getElementById('btn-edit-tag').style.display = 'inline';
         document.getElementById('btn-share-pub').style.display = 'inline';
         
+        closeModalAll();
         alert('Wallet generated successfully! Keep your private key safe.');
         fetchNetworkData(); // trigger balance update
     } catch (err) {
@@ -476,6 +570,10 @@ btnSubmitImport.addEventListener('click', () => {
         
         pubKeyField.textContent = formatAlias(pub);
         privKeyField.textContent = formatKeyDisplay(pk);
+        
+        const accountNameField = document.getElementById('wallet-account-name');
+        if (accountNameField) accountNameField.textContent = currentWallet.alias;
+        
         togglePrivKey.style.display = 'inline';
         document.getElementById('btn-show-qr').style.display = 'inline';
         document.getElementById('btn-edit-tag').style.display = 'inline';
@@ -485,6 +583,7 @@ btnSubmitImport.addEventListener('click', () => {
         importPriv.value = '';
         importPub.value = '';
         
+        closeModalAll();
         fetchNetworkData();
     } else {
         alert("Please paste both Private and Public keys in PEM format.");

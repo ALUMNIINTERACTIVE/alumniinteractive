@@ -134,7 +134,7 @@
                     </div>
                     <div style="display: flex; gap: 16px; color: var(--text-main);">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg id="btn-open-settings" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="cursor: pointer;"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </div>
                 </div>
 
@@ -204,23 +204,144 @@
                     </div>
                 </div>
 
-                <!-- Hidden Wallet Management Elements (For JS Logic Compatibility) -->
-                <div style="display: none;">
-                    <div id="wallet-pub"></div>
-                    <div id="wallet-priv"></div>
-                    <button id="btn-generate-wallet"></button>
-                    <button id="btn-import-wallet"></button>
-                    <button id="btn-disconnect-wallet"></button>
-                    <input type="text" id="tx-to">
-                    <input type="number" id="tx-amount">
-                    <button id="btn-send-tx"></button>
-                    <input id="import-priv-input">
-                    <input id="import-pub-input">
-                    <button id="btn-submit-import"></button>
-                    <span id="btn-edit-tag"></span>
-                    <span id="btn-show-qr"></span>
-                    <span id="btn-share-pub"></span>
-                    <canvas id="qr-canvas"></canvas>
+                <!-- Wallet Action Modals (Hidden by default) -->
+                <div id="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; backdrop-filter: blur(4px);"></div>
+
+                <!-- Account Management Modal -->
+                <div id="modal-account" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-panel); border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; z-index: 101; max-width: 1200px; margin: 0 auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.5);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="font-size: 1.2rem;">Accounts</h3>
+                        <svg class="close-modal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="cursor: pointer;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </div>
+                    <div id="account-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px;">
+                        <!-- Selected Account Details -->
+                        <div style="margin-bottom: 12px; font-size: 0.85rem; color: var(--text-muted);">Current Active Account:</div>
+                        <div class="input-field" style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: none; margin-bottom: 8px;">
+                            <span id="wallet-pub" style="overflow: hidden; text-overflow: ellipsis;">Not Generated</span>
+                            <span id="btn-share-pub" style="color: var(--accent); cursor: pointer; padding-left: 10px;">Copy</span>
+                        </div>
+                        <div class="input-field secret" style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: none;">
+                            <span id="wallet-priv" style="filter: blur(5px); overflow: hidden; text-overflow: ellipsis;">Not Generated</span>
+                            <span id="toggle-priv-key" style="color: var(--accent); cursor: pointer; padding-left: 10px;">Show</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button id="btn-generate-wallet" class="btn primary glow" style="width: 100%;">Create New Wallet</button>
+                        <button id="btn-import-wallet" class="btn secondary" style="width: 100%;">Import Wallet</button>
+                        <button id="btn-disconnect-wallet" class="btn secondary" style="width: 100%; border-color: var(--danger); color: var(--danger); display: none;">Disconnect</button>
+                    </div>
+
+                    <div id="import-wallet-form" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <textarea id="import-priv-input" placeholder="Paste Private Key (PEM)" class="input-field" style="min-height: 60px;"></textarea>
+                        <textarea id="import-pub-input" placeholder="Paste Public Key (PEM)" class="input-field" style="min-height: 60px;"></textarea>
+                        <button id="btn-submit-import" class="btn primary full-width">Confirm Import</button>
+                    </div>
+                    
+                    <!-- Hidden elements needed for logic -->
+                    <select id="wallet-selector" style="display: none;"></select>
+                    <span id="btn-edit-tag" style="display: none;"></span>
+                </div>
+
+                <!-- Send Modal -->
+                <div id="modal-send" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-panel); border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; z-index: 101; max-width: 1200px; margin: 0 auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.5);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="font-size: 1.2rem;">Send ALUMNI</h3>
+                        <svg class="close-modal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="cursor: pointer;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </div>
+                    <label style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 8px; display:block;">To</label>
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                        <input type="text" id="tx-to" placeholder="Search, public address (PEM), or @alias" class="input-field" style="flex: 1; margin: 0;">
+                        <button id="btn-scan-qr" class="btn secondary" style="padding: 0 16px; margin: 0;">📷</button>
+                    </div>
+                    <label style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 8px; display:block;">Amount</label>
+                    <input type="number" id="tx-amount" placeholder="0.00" class="input-field" style="font-size: 1.5rem; text-align: center; height: 60px;">
+                    <button id="btn-send-tx" class="btn primary glow full-width" style="margin-top: 24px; height: 50px;">Next</button>
+                </div>
+
+                <!-- Receive Modal -->
+                <div id="modal-receive" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-panel); border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; z-index: 101; max-width: 1200px; margin: 0 auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); text-align: center;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="width: 24px;"></div> <!-- Spacer -->
+                        <h3 style="font-size: 1.2rem;">Receive</h3>
+                        <svg class="close-modal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="cursor: pointer;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </div>
+                    <div id="qr-display-container" style="background: white; padding: 16px; border-radius: 16px; display: inline-block; margin-bottom: 20px;">
+                        <canvas id="qr-canvas"></canvas>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Scan address to receive payment</p>
+                    <button id="btn-show-qr" class="btn primary glow" style="margin-bottom: 12px; display: none;">Generate QR Code</button>
+                </div>
+
+                <!-- Settings / Hamburger Menu Modal -->
+                <div id="modal-settings" style="display: none; position: fixed; inset: 0; background: var(--bg-panel); z-index: 200; overflow-y: auto;">
+                    <div style="padding: 20px; display: flex; align-items: center; border-bottom: 1px solid var(--border-color);">
+                        <svg class="close-modal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="cursor: pointer; margin-right: 20px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <h2 style="font-size: 1.2rem; margin: 0;">Settings</h2>
+                    </div>
+
+                    <div style="padding: 20px;">
+                        <!-- Quick Actions -->
+                        <div style="display: flex; gap: 12px; margin-bottom: 30px;">
+                            <div class="settings-action-btn" id="btn-settings-buy" style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer;">
+                                <div style="font-size: 1.5rem; margin-bottom: 8px;">$</div>
+                                <div style="font-size: 0.9rem; font-weight: 500;">Buy</div>
+                            </div>
+                            <div class="settings-action-btn" id="btn-settings-scan" style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer;">
+                                <div style="font-size: 1.5rem; margin-bottom: 8px;">QR</div>
+                                <div style="font-size: 0.9rem; font-weight: 500;">Scan</div>
+                            </div>
+                        </div>
+
+                        <!-- Top Items -->
+                        <div class="settings-list-item">
+                            <span>🔔 Notifications</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">7</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </div>
+                        </div>
+                        <div class="settings-list-item">
+                            <span>💳 MetaMask Card</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+
+                        <!-- Manage Section -->
+                        <div class="settings-section-title">Manage</div>
+                        <div class="settings-list-item">
+                            <span>⚙️ Settings</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                        <div class="settings-list-item">
+                            <span>📘 Contacts</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                        <div class="settings-list-item">
+                            <span>🌐 Networks</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+
+                        <!-- Resources Section -->
+                        <div class="settings-section-title">Resources</div>
+                        <div class="settings-list-item">
+                            <span>ℹ️ About MetaMask</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                        <div class="settings-list-item" onclick="window.switchTab('docs'); document.querySelectorAll('.close-modal').forEach(b => b.click());">
+                            <span>📖 Documentation</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                        <div class="settings-list-item">
+                            <span>📋 Request a feature</span>
+                        </div>
+                        <div class="settings-list-item">
+                            <span>🎧 Contact support</span>
+                        </div>
+
+                        <!-- Danger Zone -->
+                        <div class="settings-list-item" id="btn-settings-logout" style="color: #ef4444; border-bottom: none; margin-top: 20px;">
+                            <span>🔓 Log out</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -266,7 +387,7 @@
                         <p style="font-size: 0.85rem; margin-bottom: 12px;">Earn full block rewards (1 ALUMNI) by running a Desktop Node.</p>
                         <ol style="font-size: 0.8rem; margin-left: 20px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;">
                             <li>Download the Desktop Client from the official repository.</li>
-                            <li>Stake at least 1,000 ALUMNI using the Web Wallet.</li>
+                            <li>Stake at least 50 ALUMNI using the Web Wallet.</li>
                             <li>Run <code>node start-node.mjs</code> on your machine.</li>
                             <li>Keep port 6001 open to accept incoming connections.</li>
                         </ol>

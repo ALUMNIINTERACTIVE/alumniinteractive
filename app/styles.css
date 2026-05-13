@@ -498,6 +498,29 @@ td {
     }
 }
 
+/* Settings Menu Styles */
+.settings-action-btn:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+.settings-list-item {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 16px 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+.settings-list-item:hover {
+    opacity: 0.8;
+}
+.settings-section-title {
+    font-size: 0.8rem; 
+    color: var(--text-muted); 
+    margin-top: 30px; 
+    margin-bottom: 10px;
+}
+
 @media (min-width: 769px) {
     .sidebar {
         display: flex;
@@ -508,4 +531,9 @@ td {
     .content-area {
         padding: 3rem 4rem;
     }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
 }
