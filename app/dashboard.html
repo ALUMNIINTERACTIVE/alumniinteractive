@@ -112,7 +112,7 @@
                         </div>
                         <h4 style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem;">Top traded (24h)</h4>
                         
-                        <div class="hide-scrollbar" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 16px;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-bottom: 16px;">
                             <!-- ETH -->
                             <div style="min-width: 140px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -294,7 +294,7 @@
 
                 <!-- Banner -->
                 <div class="banner-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 16px; margin-bottom: 30px;">
-                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎉</div>
+                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎉</div>
                     <div style="flex: 1;">
                         <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 4px;">Mainnet is Live</div>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">Explore the ALUMNI Web3 Ecosystem</div>
@@ -367,8 +367,8 @@
                             <option value="solana">Solana (Base58)</option>
                             <option value="bitcoin">Bitcoin (BTC Address)</option>
                         </select>
-                        <textarea id="import-priv-input" placeholder="Paste Private Key (PEM format for Alumni)" class="input-field" style="min-height: 60px;"></textarea>
-                        <textarea id="import-pub-input" placeholder="Paste Public Address or PEM Key" class="input-field" style="min-height: 60px;"></textarea>
+                        <textarea id="import-pub-input" placeholder="Paste Public Address" class="input-field" style="min-height: 60px;"></textarea>
+                        <textarea id="import-priv-input" placeholder="Paste Secret (Private Key or 12/24-Word Seed Phrase)" class="input-field" style="min-height: 60px;"></textarea>
                         <button id="btn-submit-import" class="btn primary full-width">Connect Wallet</button>
                     </div>
                     
@@ -462,7 +462,7 @@
                             <span>📋 Request a feature</span>
                         </div>
                         <div class="settings-list-item">
-                            <span>🎧 Contact support</span>
+                            <a href="mailto:dev@alumniinteractive.com" style="color: inherit; text-decoration: none; width: 100%;">🎧 dev@alumniinteractive.com</a>
                         </div>
 
                         <!-- Danger Zone -->
@@ -478,11 +478,55 @@
                 <header class="view-header">
                     <h2>Transaction Activity</h2>
                 </header>
-                <div class="card glass-panel">
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 16px; opacity: 0.5;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        <h3>No recent activity</h3>
-                        <p style="font-size: 0.85rem; margin-top: 8px;">Your transactions will appear here once you send or receive ALUMNI.</p>
+                <div class="dashboard-grid">
+                    <div class="card glass-panel span-2">
+                        <div style="display: flex; flex-direction: column;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--success);">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">Received ALUMNI</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">From: 0x7a...9f2b • 2 hrs ago</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 600; font-size: 1rem; color: var(--success);">+50.00 ALUMNI</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">Confirmed</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 40px; height: 40px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--danger);">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">Sent ETH</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">To: 0x3b...1c4a • 1 day ago</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 600; font-size: 1rem;">-0.15 ETH</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">Confirmed</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent);">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; font-size: 1rem;">Smart Contract Execution</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">Method: Stake • 3 days ago</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 600; font-size: 1rem;">-50.00 ALUMNI</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">Confirmed</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -500,14 +544,14 @@
                         <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                                 <span style="font-size: 0.8rem; color: var(--text-muted);">Status</span>
-                                <span style="font-size: 0.8rem; color: var(--success); font-weight: 600;">Standby</span>
+                                <span id="miner-status" style="font-size: 0.8rem; color: var(--success); font-weight: 600;">Standby</span>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="font-size: 0.8rem; color: var(--text-muted);">Hashrate</span>
-                                <span style="font-size: 0.8rem; font-family: monospace;">0.0 H/s</span>
+                                <span id="miner-hashrate" style="font-size: 0.8rem; font-family: monospace;">0.0 H/s</span>
                             </div>
                         </div>
-                        <button class="btn primary full-width glow">Start Mobile Mining</button>
+                        <button id="btn-start-miner" class="btn primary full-width glow">Start Mobile Mining</button>
                     </div>
 
                     <div class="card glass-panel">
@@ -518,6 +562,19 @@
                             <div>$ cd alumni-blockchain</div>
                             <div>$ node start-node.mjs</div>
                         </div>
+                    </div>
+
+                    <div class="card glass-panel" style="grid-column: 1 / -1;">
+                        <h3>Stake ALUMNI</h3>
+                        <p style="font-size: 0.85rem; margin-bottom: 12px;">Lock your ALUMNI to secure the network and earn passive yields. Requires a minimum of 50 ALUMNI.</p>
+                        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 16px; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <input type="number" placeholder="50.0" style="background: transparent; border: none; color: white; font-size: 1.5rem; width: 60%; outline: none;" value="50">
+                                <div style="font-weight: 600; color: var(--accent);">ALUMNI</div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 8px;">APY: ~12.5%</div>
+                        </div>
+                        <button class="btn secondary full-width">Stake Tokens</button>
                     </div>
                 </div>
             </section>
@@ -530,51 +587,43 @@
                 </header>
 
                 <div class="dashboard-grid">
-                    <!-- Token Forge -->
-                    <div class="card glass-panel">
-                        <h3>Token Forge</h3>
-                        <p class="subtitle" style="margin-bottom:12px; font-size:0.85rem;">Mint a new ALC-20 Token directly on-chain.</p>
-                        <input type="text" id="mint-symbol" placeholder="Token Symbol (e.g., ALC)" class="input-field">
-                        <input type="number" id="mint-supply" placeholder="Total Supply" class="input-field">
-                        <button id="btn-mint-token" class="btn secondary full-width">Mint Token</button>
-                    </div>
-
-                    <!-- Liquidity Manager -->
-                    <div class="card glass-panel">
-                        <h3>Liquidity Manager</h3>
-                        <p class="subtitle" style="margin-bottom:12px; font-size:0.85rem;">Initialize a new Liquidity Pool for trading.</p>
-                        <div style="display:flex; gap:8px;">
-                            <input type="text" id="pool-sym-a" placeholder="Symbol A" class="input-field">
-                            <input type="text" id="pool-sym-b" placeholder="Symbol B" class="input-field">
+                    <!-- Swap UI -->
+                    <div class="card glass-panel" style="max-width: 480px; margin: 0 auto; grid-column: 1 / -1; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3>Swap</h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted); cursor: pointer;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         </div>
-                        <div style="display:flex; gap:8px;">
-                            <input type="number" id="pool-amt-a" placeholder="Amount A" class="input-field">
-                            <input type="number" id="pool-amt-b" placeholder="Amount B" class="input-field">
+                        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 16px; margin-bottom: 8px;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">You pay</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <input type="number" placeholder="0" style="background: transparent; border: none; color: white; font-size: 2rem; width: 60%; outline: none;">
+                                <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600;">
+                                    <div style="width: 24px; height: 24px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">A</div>
+                                    ALUMNI ▾
+                                </div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 8px;">Balance: 0.00</div>
                         </div>
-                        <button id="btn-create-pool" class="btn secondary full-width">Create Pool</button>
-                    </div>
-
-                    <!-- Swap Engine -->
-                    <div class="card glass-panel span-2" style="max-width:500px; margin: 0 auto; width:100%;">
-                        <h3 style="text-align:center;">Swap Engine</h3>
-                        <div class="transaction-form">
-                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px; display:block;">You Pay</label>
-                            <div style="display:flex; gap:8px; margin-bottom: 12px;">
-                                <input type="number" id="swap-amt-in" placeholder="0.0" class="input-field" style="flex:2; margin:0;">
-                                <input type="text" id="swap-sym-in" placeholder="ALUMNI" class="input-field" style="flex:1; margin:0;">
+                        
+                        <div style="display: flex; justify-content: center; margin: -16px 0; position: relative; z-index: 10;">
+                            <div style="background: var(--bg-panel); border: 4px solid var(--bg-base); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
                             </div>
-
-                            <div style="text-align:center; margin: 8px 0; color:var(--accent);">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                            </div>
-
-                            <label style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px; display:block;">You Receive</label>
-                            <div style="display:flex; gap:8px; margin-bottom: 24px;">
-                                <input type="text" id="swap-sym-out" placeholder="DOGE" class="input-field" style="flex:1; margin:0; width:100%;">
-                            </div>
-
-                            <button id="btn-swap-tokens" class="btn primary glow full-width">Swap Tokens</button>
                         </div>
+
+                        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 16px; margin-bottom: 24px;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">You receive</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <input type="number" placeholder="0" style="background: transparent; border: none; color: white; font-size: 2rem; width: 60%; outline: none;" readonly>
+                                <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600;">
+                                    <div style="width: 24px; height: 24px; background: #627eea; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/></svg></div>
+                                    WETH ▾
+                                </div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 8px;">Balance: 0.00</div>
+                        </div>
+
+                        <button class="btn primary glow full-width" style="height: 54px; font-size: 1.1rem;">Swap</button>
                     </div>
                 </div>
             </section>

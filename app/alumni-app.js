@@ -34,9 +34,7 @@ const btnSendTx = document.getElementById('btn-send-tx');
 const btnStakeTx = document.getElementById('btn-stake-tx');
 
 // DEX DOM
-const btnMintToken = document.getElementById('btn-mint-token');
-const btnCreatePool = document.getElementById('btn-create-pool');
-const btnSwapTokens = document.getElementById('btn-swap-tokens');
+
 
 // State
 let currentWallet = null;
@@ -500,41 +498,12 @@ togglePrivKey.addEventListener('click', () => {
 }
 
 function disconnectWallet() {
-    localStorage.removeItem('alumni_active_wallet_idx');
     currentWallet = null;
     localStorage.removeItem('alumni_wallets');
     localStorage.removeItem('alumni_active_wallet_idx');
-    renderWalletSelector();
-    
-    pubKeyField.textContent = 'Not Generated';
-    pubKeyField.dataset.rawKey = '';
-    privKeyField.textContent = 'Not Generated';
-    privKeyField.style.filter = 'blur(5px)';
-    togglePrivKey.style.display = 'none';
-    togglePrivKey.textContent = '[Show]';
-    document.getElementById('btn-show-qr').style.display = 'none';
-    document.getElementById('btn-share-pub').style.display = 'none';
-    document.getElementById('btn-edit-tag').style.display = 'none';
-    const qrDisplay = document.getElementById('qr-display-container');
-    if(qrDisplay) qrDisplay.style.display = 'none';
-    
-    // Clear new mobile UI fields
-    const accountNameField = document.getElementById('wallet-account-name');
-    if (accountNameField) accountNameField.textContent = 'Account 1';
-    
-    if (balanceField) balanceField.textContent = '0.00';
-    const smallBalanceField = document.getElementById('wallet-balance-small');
-    if (smallBalanceField) smallBalanceField.textContent = '0.00';
-    const mainUsdField = document.getElementById('wallet-balance-usd');
-    if (mainUsdField) mainUsdField.textContent = '$0.00';
-    const smallUsdField = document.getElementById('wallet-balance-usd-small');
-    if (smallUsdField) smallUsdField.textContent = '$0.00';
-
-    if(customTokensContainer) customTokensContainer.innerHTML = '<div style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No custom tokens found</div>';
-    
-    closeModalAll();
-    alert('Wallet disconnected.');
+    location.reload();
 }
+
 
 const btnDisconnectWallet = document.getElementById('btn-disconnect-wallet');
 if (btnDisconnectWallet) {
@@ -599,24 +568,17 @@ btnImport.addEventListener('click', () => {
 const importNetworkSelect = document.getElementById('import-network-select');
 if (importNetworkSelect) {
     importNetworkSelect.addEventListener('change', (e) => {
-        const net = e.target.value;
-        if (net === 'alumni') {
-            importPriv.style.display = 'block';
-            importPub.placeholder = 'Paste Public Address or PEM Key';
-        } else {
-            importPriv.style.display = 'none';
-            importPub.placeholder = 'Paste Public Address';
-        }
+        // Kept for UI future expansion, both fields remain visible
     });
 }
 
 btnSubmitImport.addEventListener('click', () => {
     const net = importNetworkSelect ? importNetworkSelect.value : 'alumni';
     const pub = importPub.value.trim().replace(/\\n/g, '\n');
-    const pk = (importPriv.style.display !== 'none') ? importPriv.value.trim().replace(/\\n/g, '\n') : '';
+    const pk = importPriv.value.trim().replace(/\\n/g, '\n');
     
-    if (!pub) return alert("Please provide a Public Key or Address.");
-    if (net === 'alumni' && !pk) return alert("Please paste Private Key in PEM format for Alumni network.");
+    if (!pub) return alert("Please provide a Public Address.");
+    if (!pk) return alert("Please provide the Private Key or Seed Phrase.");
     
     let alias = `Imported ${net.toUpperCase()} Wallet`;
     if (net === 'alumni') {
@@ -639,11 +601,7 @@ btnSubmitImport.addEventListener('click', () => {
     const accountNameField = document.getElementById('wallet-account-name');
     if (accountNameField) accountNameField.textContent = currentWallet.alias;
     
-    if (net === 'alumni') {
-        togglePrivKey.style.display = 'inline';
-    } else {
-        togglePrivKey.style.display = 'none';
-    }
+    togglePrivKey.style.display = 'inline';
     
     document.getElementById('btn-show-qr').style.display = 'inline';
     document.getElementById('btn-edit-tag').style.display = 'inline';
@@ -929,160 +887,7 @@ btnStakeTx.addEventListener('click', async () => {
     }
 });
 
-// --- DEX Logic ---
-btnMintToken.addEventListener('click', async (e) => {
-    e.preventDefault();
-    console.log("MINT BUTTON CLICKED!", currentWallet);
-    if (!currentWallet) return alert("Please generate or import a wallet first!");
-    const symbol = document.getElementById('mint-symbol').value;
-    const supply = document.getElementById('mint-supply').value;
-    console.log("Values:", symbol, supply);
-    if (!symbol || !supply) return console.log("Returned early due to missing symbol or supply");
 
-    try {
-        const btn = document.getElementById('btn-mint-token');
-        const originalText = btn.textContent;
-        btn.textContent = 'Minting...';
-        btn.style.opacity = '0.5';
-
-        console.log("Fetching...", API_URL);
-        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({
-                privateKey: currentWallet.privateKey,
-                fromAddress: currentWallet.publicKey,
-                toAddress: DEFI_ADDRESS,
-                amount: 0,
-                type: 'CONTRACT_CALL',
-                payload: { method: 'createToken', args: { symbol, supply: parseInt(supply) } }
-            })
-        });
-        console.log("Fetch finished! Status:", res.status);
-        const data = await res.json();
-        console.log("Parsed JSON data:", data);
-        
-        btn.textContent = originalText;
-        btn.style.opacity = '1';
-
-        if (data.error) {
-            btn.textContent = 'Error!';
-            setTimeout(() => btn.textContent = originalText, 2000);
-            alert(data.error);
-        } else {
-            btn.textContent = 'Success!';
-            setTimeout(() => btn.textContent = originalText, 2000);
-            alert(`Minted ${supply} ${symbol}! Tx Hash: ` + data.hash);
-            document.getElementById('mint-symbol').value = '';
-            document.getElementById('mint-supply').value = '';
-        }
-    } catch (err) {
-        console.error("MINT ERROR:", err);
-        const btn = document.getElementById('btn-mint-token');
-        btn.textContent = 'Network Error';
-        btn.style.background = '#ef4444';
-        setTimeout(() => {
-            btn.textContent = 'Mint Token';
-            btn.style.background = '';
-        }, 3000);
-        alert("Error minting token: " + err.message);
-    }
-});
-
-btnCreatePool.addEventListener('click', async () => {
-    if (!currentWallet) return alert("Please generate or import a wallet first!");
-    const symA = document.getElementById('pool-sym-a').value;
-    const symB = document.getElementById('pool-sym-b').value;
-    const amtA = document.getElementById('pool-amt-a').value;
-    const amtB = document.getElementById('pool-amt-b').value;
-    
-    if (!symA || !symB || !amtA || !amtB) return;
-
-    try {
-        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({
-                privateKey: currentWallet.privateKey,
-                fromAddress: currentWallet.publicKey,
-                toAddress: DEFI_ADDRESS,
-                amount: 0,
-                type: 'CONTRACT_CALL',
-                payload: { method: 'createPool', args: { symbolA: symA, symbolB: symB, amountA: parseFloat(amtA), amountB: parseFloat(amtB) } }
-            })
-        });
-        const data = await res.json();
-        if (data.error) alert(data.error);
-        else alert(`Pool Created! Tx Hash: ` + data.hash);
-    } catch (e) {
-        alert("Error creating pool");
-    }
-});
-
-btnSwapTokens.addEventListener('click', async (e) => {
-    e.preventDefault();
-    if (!currentWallet) return alert("Please generate or import a wallet first!");
-    const symIn = document.getElementById('swap-sym-in').value;
-    const symOut = document.getElementById('swap-sym-out').value;
-    const amtIn = document.getElementById('swap-amt-in').value;
-    
-    if (!symIn || !symOut || !amtIn) return;
-
-    try {
-        const btn = document.getElementById('btn-swap-tokens');
-        const originalText = btn.textContent;
-        btn.textContent = 'Swapping...';
-        btn.style.opacity = '0.5';
-
-        const res = await fetch(`${API_URL}/transaction/sign-and-send`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true'
-            },
-            body: JSON.stringify({
-                privateKey: currentWallet.privateKey,
-                fromAddress: currentWallet.publicKey,
-                toAddress: DEFI_ADDRESS,
-                amount: 0,
-                type: 'CONTRACT_CALL',
-                payload: { method: 'swap', args: { symbolIn: symIn, symbolOut: symOut, amountIn: parseFloat(amtIn) } }
-            })
-        });
-        const data = await res.json();
-        
-        btn.textContent = originalText;
-        btn.style.opacity = '1';
-
-        if (data.error) {
-            btn.textContent = 'Error!';
-            setTimeout(() => btn.textContent = originalText, 2000);
-            alert(data.error);
-        } else {
-            btn.textContent = 'Success!';
-            setTimeout(() => btn.textContent = originalText, 2000);
-            alert(`Swap Executed! Tx Hash: ` + data.hash);
-            document.getElementById('swap-sym-in').value = '';
-            document.getElementById('swap-sym-out').value = '';
-            document.getElementById('swap-amt-in').value = '';
-        }
-    } catch (err) {
-        const btn = document.getElementById('btn-swap-tokens');
-        btn.textContent = 'Network Error';
-        btn.style.background = '#ef4444';
-        setTimeout(() => {
-            btn.textContent = 'Swap Tokens';
-            btn.style.background = '';
-        }, 3000);
-        alert("Error executing swap: " + err.message);
-    }
-});
 
 async function initDashboard() {
     document.querySelector('.status-indicator').style.background = '#eab308'; // searching yellow
@@ -1199,6 +1004,60 @@ async function fetchLiveMarketPrices() {
         document.getElementById('price-xau').textContent = '$' + (goldBase + r1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('price-xag').textContent = '$' + (silverBase + r2).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }, 5000);
+}
+
+// --- Mobile Mining Mock Logic ---
+const btnStartMiner = document.getElementById('btn-start-miner');
+const minerStatus = document.getElementById('miner-status');
+const minerHashrate = document.getElementById('miner-hashrate');
+let miningInterval;
+
+if (btnStartMiner) {
+    btnStartMiner.addEventListener('click', () => {
+        if (minerStatus.textContent === 'Standby') {
+            minerStatus.textContent = 'Mining Active';
+            minerStatus.style.color = '#10b981';
+            btnStartMiner.textContent = 'Stop Mining';
+            btnStartMiner.classList.remove('primary');
+            btnStartMiner.classList.add('secondary');
+            
+            miningInterval = setInterval(() => {
+                const hr = (Math.random() * (12.5 - 9.0) + 9.0).toFixed(1);
+                minerHashrate.textContent = `${hr} MH/s`;
+            }, 2000);
+            
+            alert('Mobile mining started. Rewards accrue automatically in the background.');
+        } else {
+            minerStatus.textContent = 'Standby';
+            minerStatus.style.color = '#9e9ea7';
+            minerHashrate.textContent = '0.0 H/s';
+            btnStartMiner.textContent = 'Start Mobile Mining';
+            btnStartMiner.classList.remove('secondary');
+            btnStartMiner.classList.add('primary');
+            clearInterval(miningInterval);
+        }
+    });
+}
+
+// --- Swap Logic Mock ---
+const btnSwapTokens = document.getElementById('btn-swap-tokens');
+if (btnSwapTokens) {
+    btnSwapTokens.addEventListener('click', () => {
+        const swapIn = document.getElementById('swap-amt-in');
+        if (!swapIn || !swapIn.value || parseFloat(swapIn.value) <= 0) {
+            return alert('Enter a valid amount to swap.');
+        }
+        
+        btnSwapTokens.textContent = 'Swapping...';
+        btnSwapTokens.disabled = true;
+        
+        setTimeout(() => {
+            btnSwapTokens.textContent = 'Swap Tokens';
+            btnSwapTokens.disabled = false;
+            swapIn.value = '';
+            alert('Swap successful! View activity in your wallet.');
+        }, 1500);
+    });
 }
 
 initDashboard();
