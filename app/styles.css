@@ -47,6 +47,12 @@ body {
     margin: 0 auto;
 }
 
+.content-area {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
 /* Sidebar (Hidden on Mobile) */
 .sidebar {
     width: 280px;
