@@ -995,4 +995,51 @@ async function initDashboard() {
     setInterval(fetchNetworkData, 3000);
 }
 
+async function fetchLiveMarketPrices() {
+    try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,the-open-network&vs_currencies=usd&include_24hr_change=true');
+        if (res.ok) {
+            const data = await res.json();
+            
+            if (data.bitcoin) {
+                document.getElementById('price-btc').textContent = '$' + data.bitcoin.usd.toLocaleString();
+                const btcChg = data.bitcoin.usd_24h_change;
+                document.getElementById('change-btc').textContent = (btcChg > 0 ? '+' : '') + btcChg.toFixed(2) + '%';
+                document.getElementById('change-btc').style.color = btcChg >= 0 ? '#10b981' : '#ef4444';
+            }
+            if (data.ethereum) {
+                document.getElementById('price-eth').textContent = '$' + data.ethereum.usd.toLocaleString();
+                const ethChg = data.ethereum.usd_24h_change;
+                document.getElementById('change-eth').textContent = (ethChg > 0 ? '+' : '') + ethChg.toFixed(2) + '%';
+                document.getElementById('change-eth').style.color = ethChg >= 0 ? '#10b981' : '#ef4444';
+            }
+            if (data.solana) {
+                document.getElementById('price-sol').textContent = '$' + data.solana.usd.toLocaleString();
+                const solChg = data.solana.usd_24h_change;
+                document.getElementById('change-sol').textContent = (solChg > 0 ? '+' : '') + solChg.toFixed(2) + '%';
+                document.getElementById('change-sol').style.color = solChg >= 0 ? '#10b981' : '#ef4444';
+            }
+            if (data['the-open-network']) {
+                document.getElementById('price-ton').textContent = '$' + data['the-open-network'].usd.toLocaleString(undefined, {minimumFractionDigits: 2});
+                const tonChg = data['the-open-network'].usd_24h_change;
+                document.getElementById('change-ton').textContent = (tonChg > 0 ? '+' : '') + tonChg.toFixed(2) + '%';
+                document.getElementById('change-ton').style.color = tonChg >= 0 ? '#10b981' : '#ef4444';
+            }
+        }
+    } catch (err) {
+        console.log("Failed to fetch live crypto prices, using fallbacks.");
+    }
+
+    // Mock live fluctuations for Gold/Silver for the demo
+    const goldBase = 2450.10;
+    const silverBase = 29.40;
+    setInterval(() => {
+        const r1 = (Math.random() - 0.5) * 5; // Fluctuate up to $2.50
+        const r2 = (Math.random() - 0.5) * 0.2; // Fluctuate up to $0.10
+        document.getElementById('price-xau').textContent = '$' + (goldBase + r1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('price-xag').textContent = '$' + (silverBase + r2).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }, 5000);
+}
+
 initDashboard();
+fetchLiveMarketPrices();
