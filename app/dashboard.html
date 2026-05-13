@@ -112,7 +112,7 @@
                         </div>
                         <h4 style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem;">Top traded (24h)</h4>
                         
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-bottom: 16px;">
+                        <div class="hide-scrollbar" style="display: flex; overflow-x: auto; gap: 16px; padding-bottom: 16px;">
                             <!-- ETH -->
                             <div style="min-width: 140px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -400,10 +400,12 @@
                         <h3 style="font-size: 1.2rem;">Receive</h3>
                         <svg class="close-modal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="cursor: pointer;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </div>
-                    <div id="qr-display-container" style="background: white; padding: 16px; border-radius: 16px; display: inline-block; margin-bottom: 20px;">
+                    <div id="qr-display-container" style="background: white; padding: 16px; border-radius: 16px; display: inline-block; margin-bottom: 20px; position: relative;">
                         <canvas id="qr-canvas"></canvas>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 4px; border-radius: 8px; color: #10b981; font-size: 32px; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; line-height: 1;">▲</div>
                     </div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Scan address to receive payment</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; word-break: break-all;" id="receive-address-text">Scan address to receive payment</p>
+                    <button id="btn-copy-address" class="btn secondary full-width" style="margin-bottom: 12px;">Copy Address</button>
                     <button id="btn-show-qr" class="btn primary glow" style="margin-bottom: 12px; display: none;">Generate QR Code</button>
                 </div>
 
@@ -614,7 +616,7 @@
                         <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 16px; margin-bottom: 24px;">
                             <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">You receive</div>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <input type="number" placeholder="0" style="background: transparent; border: none; color: white; font-size: 2rem; width: 60%; outline: none;" readonly>
+                                <input type="number" id="swap-amt-out" placeholder="0" style="background: transparent; border: none; color: white; font-size: 2rem; width: 60%; outline: none;" readonly>
                                 <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600;">
                                     <div style="width: 24px; height: 24px; background: #627eea; border-radius: 50%; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M11.944 17.97L4.58 13.62 11.943 24l7.37-10.38-7.372 4.35h.003zM12.056 0L4.69 12.223l7.365 4.354 7.365-4.35L12.056 0z"/></svg></div>
                                     WETH ▾

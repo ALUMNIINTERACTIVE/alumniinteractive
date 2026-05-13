@@ -381,6 +381,15 @@ function updateDashboard(blocks, pending, validators) {
     // Reverse blocks to show newest first, limit to 10
     const recentBlocks = [...blocks].reverse().slice(0, 10);
     
+    if (recentBlocks.length === 0 || (recentBlocks.length === 1 && recentBlocks[0].transactions.length === 0)) {
+        // Only genesis block or empty
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Waiting for network transactions...</td>
+        `;
+        blocksTable.appendChild(tr);
+    }
+    
     recentBlocks.forEach(block => {
         const tr = document.createElement('tr');
         const age = Math.floor((Date.now() - block.timestamp) / 1000);
@@ -641,15 +650,14 @@ btnSubmitImport.addEventListener('click', () => {
     fetchNetworkData();
 });
 
-// --- QR Code Logic ---
-const btnShowQr = document.getElementById('btn-show-qr');
+// --- QR Code & Copy Logic ---
 const qrContainer = document.getElementById('qr-display-container');
 const qrCanvas = document.getElementById('qr-canvas');
+const btnShowQr = document.getElementById('btn-show-qr');
 
 if (btnShowQr) {
-btnShowQr.addEventListener('click', () => {
-    if (!currentWallet) return;
-    if (qrContainer.style.display === 'none') {
+    btnShowQr.addEventListener('click', () => {
+        if (!currentWallet) return;
         const tag = (currentWallet.alias && !currentWallet.alias.startsWith('Wallet ') && !currentWallet.alias.startsWith('Imported Wallet ')) ? currentWallet.alias : '';
         const payload = `${tag}|${stripPemHeaders(currentWallet.publicKey)}`;
         new QRious({
@@ -659,13 +667,28 @@ btnShowQr.addEventListener('click', () => {
             background: 'white',
             foreground: 'black'
         });
-        qrContainer.style.display = 'flex';
-        btnShowQr.textContent = '[Hide QR]';
-    } else {
-        qrContainer.style.display = 'none';
-        btnShowQr.textContent = '[Show QR]';
-    }
-});
+        qrContainer.style.display = 'inline-block';
+        
+        const addrText = document.getElementById('receive-address-text');
+        if(addrText) {
+            addrText.textContent = stripPemHeaders(currentWallet.publicKey);
+        }
+    });
+}
+
+const btnCopyAddress = document.getElementById('btn-copy-address');
+if (btnCopyAddress) {
+    btnCopyAddress.addEventListener('click', () => {
+        if (!currentWallet) return;
+        const pubKey = stripPemHeaders(currentWallet.publicKey);
+        navigator.clipboard.writeText(pubKey).then(() => {
+            const originalText = btnCopyAddress.textContent;
+            btnCopyAddress.textContent = 'Copied!';
+            setTimeout(() => {
+                btnCopyAddress.textContent = originalText;
+            }, 2000);
+        });
+    });
 }
 
 let html5QrcodeScanner = null;
@@ -988,14 +1011,28 @@ async function fetchLiveMarketPrices() {
         console.log("Failed to fetch live crypto prices, using fallbacks.");
     }
 
-    // Mock live fluctuations for Gold/Silver for the demo
-    const goldBase = 2450.10;
-    const silverBase = 29.40;
+    // Mock live fluctuations for Gold/Silver and Fallback Crypto prices
+    let goldBase = 2450.10;
+    let silverBase = 29.40;
+    let btcBase = 68200.00;
+    let ethBase = 3850.00;
+    let solBase = 165.20;
     setInterval(() => {
-        const r1 = (Math.random() - 0.5) * 5; // Fluctuate up to $2.50
-        const r2 = (Math.random() - 0.5) * 0.2; // Fluctuate up to $0.10
-        document.getElementById('price-xau').textContent = '$' + (goldBase + r1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('price-xag').textContent = '$' + (silverBase + r2).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const r1 = (Math.random() - 0.5) * 5; 
+        const r2 = (Math.random() - 0.5) * 0.2; 
+        const rBtc = (Math.random() - 0.5) * 100;
+        const rEth = (Math.random() - 0.5) * 10;
+        const rSol = (Math.random() - 0.5) * 1;
+        
+        btcBase += rBtc;
+        ethBase += rEth;
+        solBase += rSol;
+
+        if(document.getElementById('price-xau')) document.getElementById('price-xau').textContent = '$' + (goldBase + r1).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        if(document.getElementById('price-xag')) document.getElementById('price-xag').textContent = '$' + (silverBase + r2).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        if(document.getElementById('explore-price-btc')) document.getElementById('explore-price-btc').textContent = '$' + btcBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        if(document.getElementById('explore-price-eth')) document.getElementById('explore-price-eth').textContent = '$' + ethBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        if(document.getElementById('explore-price-sol')) document.getElementById('explore-price-sol').textContent = '$' + solBase.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }, 5000);
 }
 
@@ -1032,6 +1069,20 @@ if (btnStartMiner) {
 }
 
 // --- Swap Logic ---
+const swapInEl = document.getElementById('swap-amt-in');
+const swapOutEl = document.getElementById('swap-amt-out');
+if (swapInEl && swapOutEl) {
+    swapInEl.addEventListener('input', () => {
+        const val = parseFloat(swapInEl.value);
+        if (!isNaN(val) && val > 0) {
+            // Mock exchange rate: 1 ALUMNI = 0.00015 WETH
+            swapOutEl.value = (val * 0.00015).toFixed(6);
+        } else {
+            swapOutEl.value = '';
+        }
+    });
+}
+
 const btnSwapTokens = document.getElementById('btn-swap-tokens');
 if (btnSwapTokens) {
     btnSwapTokens.addEventListener('click', async (e) => {
